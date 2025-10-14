@@ -76,24 +76,4 @@ public class CustomerServiceImpl implements CustomerService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    @Transactional
-    public void incrementAttendance(Long id) {
-        Customer customer = customerRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found or inactive with id: " + id));
-        customerRepository.save(customer);
-    }
-
-    @Override
-    public void useFreePass(Long id) {
-        Customer customer = customerRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found or inactive with id: " + id));
-
-        if (!customer.getLoyaltyFree()) {
-            throw new IllegalStateException("Customer does not have a free pass available");
-        }
-
-        customer.setLoyaltyFree(false);
-        customerRepository.save(customer);
-    }
 }

@@ -124,6 +124,25 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ReservationDTO> getReservationsByCustomer(Long customerId) {
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
+
+
+        List<Reservation> reservations = reservationRepository.findByCustomerId(customerId)
+                .stream()
+                .filter(Reservation::getActive)
+                .toList();
+
+        return reservations.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+
+    @Override
     @Transactional
     public void deleteReservation(Long id) {
         Reservation reservation = reservationRepository.findByIdAndActiveTrue(id)

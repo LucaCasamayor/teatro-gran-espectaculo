@@ -10,5 +10,6 @@ public interface ReservationService {
     ReservationDTO getReservationById(Long id);
     ReservationDTO createReservation(CreateReservationRequest request);
     ReservationDTO markAsPaid(Long id);
+    List<ReservationDTO> getReservationsByCustomer(Long customerId);
     void deleteReservation(Long id);
 }

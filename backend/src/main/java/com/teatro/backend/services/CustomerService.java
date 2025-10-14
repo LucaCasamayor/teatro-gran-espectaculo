@@ -12,6 +12,4 @@ public interface CustomerService {
     CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO);
     void deleteCustomer(Long id);
     List<CustomerDTO> getCustomersWithFreePass();
-    void incrementAttendance(Long customerId);
-    void useFreePass(Long customerId);
 }

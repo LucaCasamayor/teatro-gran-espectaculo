@@ -7,7 +7,6 @@ import com.teatro.backend.models.entities.Event;
 import com.teatro.backend.models.entities.TicketOption;
 import com.teatro.backend.models.enums.EventStatus;
 import com.teatro.backend.repositories.EventRepository;
-import com.teatro.backend.repositories.TicketOptionRepository;
 import com.teatro.backend.services.EventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -90,13 +89,17 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public void cancelEvent(Long id) {
+    public EventDTO updateEventStatus(Long id, EventStatus status) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
 
-        event.setStatus(EventStatus.CANCELLED);
-        eventRepository.save(event);
+        event.setStatus(status);
+        Event updatedEvent = eventRepository.save(event);
+
+        return modelMapper.map(updatedEvent, EventDTO.class);
     }
+
+
 
     @Override
     public List<EventDTO> getScheduledEvents() {
