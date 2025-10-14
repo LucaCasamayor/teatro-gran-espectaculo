@@ -33,7 +33,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationDTO> getAllReservations() {
-        return reservationRepository.findByActiveTrue().stream()
+        return reservationRepository.findAll().stream()
+                .filter(Reservation::getActive)
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -153,23 +154,33 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private ReservationDTO convertToDTO(Reservation reservation) {
-        ReservationDTO dto = modelMapper.map(reservation, ReservationDTO.class);
+        ReservationDTO dto = new ReservationDTO();
+        dto.setId(reservation.getId());
         dto.setCustomerId(reservation.getCustomer().getId());
-        dto.setCustomerName(reservation.getCustomer().getFirstName() + " " + reservation.getCustomer().getLastName());
+        dto.setCustomerName(
+                reservation.getCustomer().getFirstName() + " " + reservation.getCustomer().getLastName()
+        );
         dto.setEventId(reservation.getEvent().getId());
         dto.setEventTitle(reservation.getEvent().getTitle());
+        dto.setStatus(reservation.getStatus());
+        dto.setLoyaltyFree(reservation.getLoyaltyFree());
+        dto.setTotal(reservation.getTotal());
+        dto.setCreatedAt(reservation.getCreatedAt());
+        dto.setPaidAt(reservation.getPaidAt());
         dto.setAttendeeName(reservation.getAttendeeName());
         dto.setAttendedBy(reservation.getAttendedBy());
 
         List<ReservationItemDTO> itemDTOs = reservation.getItems().stream()
-                .map(item -> {
-                    ReservationItemDTO itemDTO = modelMapper.map(item, ReservationItemDTO.class);
-                    itemDTO.setTicketOptionName(item.getTicketOption().getName());
-                    return itemDTO;
-                })
+                .map(item -> new ReservationItemDTO(
+                        item.getId(),
+                        item.getTicketOption().getId(),
+                        item.getTicketOption().getName(),
+                        item.getQuantity(),
+                        item.getUnitPrice()
+                ))
                 .collect(Collectors.toList());
-        dto.setItems(itemDTOs);
 
+        dto.setItems(itemDTOs);
         return dto;
     }
 }
