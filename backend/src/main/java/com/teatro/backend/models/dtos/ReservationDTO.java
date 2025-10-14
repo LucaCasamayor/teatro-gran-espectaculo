@@ -23,6 +23,8 @@ public class ReservationDTO {
     private BigDecimal total;
     private LocalDateTime createdAt;
     private LocalDateTime paidAt;
+    private String attendeeName;
+    private String attendedBy;
     private List<ReservationItemDTO> items;
 }
 

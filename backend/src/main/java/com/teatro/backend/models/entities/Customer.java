@@ -7,9 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 @Entity
 @Table(name = "customer")
 @Data
@@ -21,9 +21,13 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name is required")
-    @Column(nullable = false)
-    private String name;
+    @NotBlank(message = "First name is required")
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @NotBlank(message = "Last name is required")
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
 
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email is required")
@@ -42,8 +46,8 @@ public class Customer {
     @Column(name = "loyalty_free", nullable = false)
     private Boolean loyaltyFree = false;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reservation> reservations = new ArrayList<>();
+    @Column(nullable = false)
+    private Boolean active = true;
 
     @PrePersist
     protected void onCreate() {
@@ -51,6 +55,15 @@ public class Customer {
     }
 
     public void incrementAttendance() {
+        int currentYear = LocalDate.now().getYear();
+        if (registrationDate.getYear() < currentYear) {
+
+            this.currentStreak = 0;
+            this.totalAttendances = 0;
+            this.loyaltyFree = false;
+            this.registrationDate = LocalDateTime.now();
+        }
+
         this.totalAttendances++;
         this.currentStreak++;
 
@@ -58,6 +71,7 @@ public class Customer {
             this.loyaltyFree = true;
         }
     }
+
 
     public void resetStreak() {
         this.currentStreak = 0;

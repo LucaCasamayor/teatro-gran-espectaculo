@@ -36,6 +36,17 @@ public class Reservation {
     @Column(nullable = false)
     private ReservationStatus status = ReservationStatus.PENDING;
 
+    // (cliente)
+    @Column(name = "attendee_name", nullable = false)
+    private String attendeeName;
+
+    // (empleado)
+    @Column(name = "attended_by")
+    private String attendedBy;
+
+    @Column(name = "created_by_admin", nullable = false)
+    private Boolean createdByAdmin = true;
+
     @Column(name = "loyalty_free", nullable = false)
     private Boolean loyaltyFree = false;
 
@@ -51,6 +62,9 @@ public class Reservation {
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReservationItem> items = new ArrayList<>();
+
+    @Column(nullable = false)
+    private Boolean active = true;
 
     @PrePersist
     protected void onCreate() {
@@ -68,15 +82,9 @@ public class Reservation {
         return this.total;
     }
 
-
     public void markAsPaid() {
         this.status = ReservationStatus.PAID;
         this.paidAt = LocalDateTime.now();
-
-        if (loyaltyFree) {
-            customer.resetStreak();
-        } else {
-            customer.incrementAttendance();
-        }
     }
 }
+
