@@ -82,9 +82,6 @@ class CustomerServiceImplTest {
         verify(customerRepository, times(1)).findByIdAndActiveTrue(99L);
     }
 
-    // -------------------------------
-    // ✅ TEST 4: createCustomer()
-    // -------------------------------
     @Test
     void shouldCreateNewCustomerWithDefaults() {
         when(modelMapper.map(customerDTO, Customer.class)).thenReturn(customer);

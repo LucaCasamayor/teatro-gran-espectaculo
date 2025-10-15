@@ -28,4 +28,5 @@ public class CustomerDTO {
     private Integer totalAttendances;
     private Integer currentStreak;
     private Boolean loyaltyFree;
+    private Boolean active;
 }
