@@ -1,0 +1,36 @@
+@startuml
+title Flujo de Negocio - Teatro Gran Espectáculo (Administrativo Interno)
+
+start
+
+:Empleado inicia sesión en el sistema;
+:Visualiza lista de eventos disponibles;
+if (Necesita crear un nuevo evento?) then (Sí)
+    :Registra nuevo evento con fecha, tipo y precios;
+    :Carga opciones de entrada (General, VIP, etc);
+else (No)
+    :Selecciona evento existente;
+endif
+
+:Empleado registra un nuevo cliente o selecciona uno existente;
+:Empleado crea una nueva reserva asociada al cliente y al evento;
+:Selecciona tipo de entrada y cantidad;
+:El sistema calcula el total de la reserva;
+
+if (Cliente paga ahora?) then (Sí)
+    :Empleado marca la reserva como PAGADA;
+    :Sistema incrementa contador de asistencias del cliente;
+    if (Cliente llega a 5 asistencias en el año?) then (Sí)
+        :Sistema otorga un pase gratuito para la próxima reserva;
+    else (No)
+        :No aplica beneficio aún;
+    endif
+else (No)
+    :Reserva queda en estado PENDIENTE;
+endif
+
+:Empleado puede modificar o cancelar reservas y eventos;
+:Sistema actualiza disponibilidad en tiempo real;
+
+stop
+@enduml

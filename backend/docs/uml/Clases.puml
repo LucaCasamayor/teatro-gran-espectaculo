@@ -1,0 +1,104 @@
+@startuml
+title Diagrama de Clases - Teatro Gran Espectáculo
+
+class Customer {
+    + Long id
+    + String firstName
+    + String lastName
+    + String email
+    + LocalDateTime registrationDate
+    + Integer totalAttendances
+    + Integer currentStreak
+    + Boolean loyaltyFree
+    + Boolean active
+
+    + incrementAttendance(): void
+    + resetStreak(): void
+}
+
+class Event {
+    + Long id
+    + String title
+    + String description
+    + EventType type
+    + LocalDateTime startDateTime
+    + LocalDateTime endDateTime
+    + EventStatus status
+    + Boolean active
+
+    + isOpenForSales(): boolean
+}
+
+class TicketOption {
+    + Long id
+    + String name
+    + BigDecimal price
+    + Integer capacity
+    + Integer sold
+    + Integer version
+
+    + getRemaining(): Integer
+    + isReservable(quantity: Integer): boolean
+    + reserve(quantity: Integer): void
+}
+
+class Reservation {
+    + Long id
+    + ReservationStatus status
+    + String attendeeName
+    + String attendedBy
+    + Boolean createdByAdmin
+    + Boolean loyaltyFree
+    + BigDecimal total
+    + LocalDateTime createdAt
+    + LocalDateTime paidAt
+    + Boolean active
+
+    + calculateTotal(): BigDecimal
+    + markAsPaid(): void
+}
+
+class ReservationItem {
+    + Long id
+    + Integer quantity
+    + BigDecimal unitPrice
+}
+
+
+enum EventType {
+    THEATER
+    CONCERT
+    CONFERENCE
+}
+
+enum EventStatus {
+    SCHEDULED
+    CANCELLED
+    FINISHED
+}
+
+enum ReservationStatus {
+    PENDING
+    PAID
+    CANCELLED
+}
+
+
+Customer "1" --> "0..*" Reservation
+Event "1" --> "0..*" TicketOption
+Event "1" --> "0..*" Reservation
+Reservation "1" --> "1..*" ReservationItem
+TicketOption "1" --> "0..*" ReservationItem
+
+
+Event --> EventType
+Event --> EventStatus
+Reservation --> ReservationStatus
+
+note right of TicketOption::version
+  Se utiliza para control de concurrencia con Optimistic Locking.
+  Cada vez que se actualiza el stock (sold), la versión aumenta.
+  Si dos transacciones intentan modificar la misma fila
+  con la misma versión, una falla y evita sobreventa.
+end note
+@enduml
