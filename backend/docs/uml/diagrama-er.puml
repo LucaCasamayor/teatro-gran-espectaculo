@@ -1,0 +1,74 @@
+@startuml
+!theme plain
+
+title Sistema de Reservas - Teatro Gran Espectáculo
+
+entity "Customer" as customer {
+  *id : BIGINT <<PK>>
+  --
+  first_name : VARCHAR(100)
+  last_name : VARCHAR(100)
+  email : VARCHAR(150) <<UNIQUE>>
+  registration_date : TIMESTAMP
+  total_attendances : INT
+  current_streak : INT
+  loyalty_free : BOOLEAN
+  active : BOOLEAN
+}
+
+entity "Event" as event {
+  *id : BIGINT <<PK>>
+  --
+  title : VARCHAR(200)
+  description : VARCHAR(1000)
+  type : VARCHAR(50)
+  start_date_time : TIMESTAMP
+  end_date_time : TIMESTAMP
+  status : VARCHAR(50)
+  active : BOOLEAN
+}
+
+entity "TicketOption" as ticket_option {
+  *id : BIGINT <<PK>>
+  --
+  event_id : BIGINT <<FK>>
+  name : VARCHAR(100)
+  price : DECIMAL(10,2)
+  capacity : INT
+  sold : INT
+  version : INT
+}
+
+entity "Reservation" as reservation {
+  *id : BIGINT <<PK>>
+  --
+  customer_id : BIGINT <<FK>>
+  event_id : BIGINT <<FK>>
+  status : VARCHAR(50)
+  attendee_name : VARCHAR(200)
+  attended_by : VARCHAR(200)
+  created_by_admin : BOOLEAN
+  loyalty_free : BOOLEAN
+  total : DECIMAL(10,2)
+  created_at : TIMESTAMP
+  paid_at : TIMESTAMP
+  active : BOOLEAN
+}
+
+entity "ReservationItem" as reservation_item {
+  *id : BIGINT <<PK>>
+  --
+  reservation_id : BIGINT <<FK>>
+  ticket_option_id : BIGINT <<FK>>
+  quantity : INT
+  unit_price : DECIMAL(10,2)
+}
+
+' Relaciones
+customer ||--o{ reservation : "realiza"
+event ||--o{ reservation : "tiene"
+event ||--o{ ticket_option : "ofrece"
+reservation ||--o{ reservation_item : "incluye"
+ticket_option ||--o{ reservation_item : "detallado en"
+
+@enduml
