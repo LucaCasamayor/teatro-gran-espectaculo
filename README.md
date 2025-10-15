@@ -47,7 +47,7 @@ El objetivo de este sistema es **automatizar la administración de eventos y res
 | **Reservation** | Reserva de entradas realizada por el empleado. Contiene estado (`PENDING`, `PAID`, `CANCELLED`), monto total, fecha y cliente. |
 | **ReservationItem** | Detalle de cada ticket reservado. |
 
-📄 *Ver diagrama completo en [`Clases.puml`](./Clases.puml)*
+📄 *Ver diagrama completo en [`Clases.puml`](./docs/uml/diagramaClases.puml)*
 
 ---
 
@@ -59,14 +59,14 @@ El objetivo de este sistema es **automatizar la administración de eventos y res
 5. Si llega la fecha y sigue `PENDING` → el sistema la **cancela automáticamente** (`CANCELLED`).  
 6. Al marcar una reserva como `PAID`, se actualiza la fidelización del cliente.  
 
-📄 *Ver diagrama completo en [`diagramaNegocio.puml`](./diagramaNegocio.puml)*
+📄 *Ver diagrama completo en [`diagramaNegocio.puml`](./docs/uml/diagramaNegocio.puml)*
 
 ---
 
 ## Base de Datos
  Base de datos embebida con H2, una vez levantado el backend:
  ```
-http://localhost:8080/h2-console/
+http://localhost:8080/h2-console
 ```
 ```
 url=jdbc:h2:mem:teatrobd
@@ -74,7 +74,7 @@ username=sa
 password=
 
 ```
- 
+ 📄 *Ver diagrama entidad-relacion en [`diagrama-er.puml`](./docs/uml/diagrama-er.puml)*
 
 📘 *Los archivos `schema.sql` y `data.sql` crean y cargan la base de datos inicial.*
 
