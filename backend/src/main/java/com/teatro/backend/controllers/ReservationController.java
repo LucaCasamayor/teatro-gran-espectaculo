@@ -34,11 +34,6 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.createReservation(request));
     }
 
-//    @PatchMapping("/{id}/pay")
-//    public ResponseEntity<ReservationDTO> markAsPaid(@PathVariable Long id) {
-//        return ResponseEntity.ok(reservationService.markAsPaid(id));
-//    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
         reservationService.deleteReservation(id);

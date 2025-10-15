@@ -102,31 +102,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
 
-
-//    @Override
-//    @Transactional
-//    public ReservationDTO markAsPaid(Long id) {
-//        Reservation reservation = reservationRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
-//
-//        if (reservation.getStatus() == ReservationStatus.PAID) {
-//            throw new IllegalStateException("Reservation already marked as paid");
-//        }
-//
-//        reservation.markAsPaid();
-//
-//        Customer customer = reservation.getCustomer();
-//        if (reservation.getLoyaltyFree()) {
-//            customer.resetStreak();
-//        } else {
-//            customer.incrementAttendance();
-//        }
-//        customerRepository.save(customer);
-//
-//        Reservation updated = reservationRepository.save(reservation);
-//        return convertToDTO(updated);
-//    }
-
     @Override
     @Transactional(readOnly = true)
     public List<ReservationDTO> getReservationsByCustomer(Long customerId) {

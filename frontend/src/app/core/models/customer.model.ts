@@ -1,7 +1,7 @@
 export class Customer {
   id!: number;
-  name!: string;
-  lastname!: string;
+  firstName!: string;
+  lastName!: string;
   email!: string;
   totalAttendances!: number;
   currentStreak!: number;
@@ -12,6 +12,6 @@ export class Customer {
   }
 
   get fullName(): string {
-    return `${this.name} ${this.lastname}`;
+    return `${this.firstName} ${this.lastName}`;
   }
 }

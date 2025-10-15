@@ -14,11 +14,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -42,7 +42,7 @@ class ReservationControllerTest {
         dto.setStatus(ReservationStatus.PAID);
         dto.setTotal(BigDecimal.valueOf(1200));
 
-        when(reservationService.getAllReservations()).thenReturn(List.of(dto));
+        Mockito.when(reservationService.getAllReservations()).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/reservations"))
                 .andExpect(status().isOk())
@@ -59,7 +59,7 @@ class ReservationControllerTest {
         dto.setEventTitle("Obra de teatro");
         dto.setStatus(ReservationStatus.PENDING);
 
-        when(reservationService.getReservationById(1L)).thenReturn(dto);
+        Mockito.when(reservationService.getReservationById(1L)).thenReturn(dto);
 
         mockMvc.perform(get("/api/reservations/1"))
                 .andExpect(status().isOk())
@@ -80,7 +80,7 @@ class ReservationControllerTest {
         response.setCustomerName("Luca Casamayor");
         response.setStatus(ReservationStatus.PENDING);
 
-        when(reservationService.createReservation(any(CreateReservationRequest.class)))
+        Mockito.when(reservationService.createReservation(any(CreateReservationRequest.class)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/api/reservations")
@@ -92,19 +92,21 @@ class ReservationControllerTest {
                 .andExpect(jsonPath("$.status").value("PENDING"));
     }
 
-//    @Test
-//    void shouldMarkReservationAsPaid() throws Exception {
-//        ReservationDTO dto = new ReservationDTO();
-//        dto.setId(1L);
-//        dto.setStatus(ReservationStatus.PAID);
-//        dto.setPaidAt(LocalDateTime.now());
-//
-//        when(reservationService.markAsPaid(1L)).thenReturn(dto);
-//
-//        mockMvc.perform(patch("/api/reservations/1/pay"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.status").value("PAID"));
-//    }
+    @Test
+    void shouldUpdateReservationStatus() throws Exception {
+        ReservationDTO updated = new ReservationDTO();
+        updated.setId(1L);
+        updated.setStatus(ReservationStatus.PAID);
+
+        Mockito.when(reservationService.updateReservationStatus(eq(1L), any(Map.class)))
+                .thenReturn(updated);
+
+        mockMvc.perform(patch("/api/reservations/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PAID\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PAID"));
+    }
 
     @Test
     void shouldDeleteReservation() throws Exception {
@@ -121,7 +123,7 @@ class ReservationControllerTest {
         dto.setCustomerName("Luca Casamayor");
         dto.setStatus(ReservationStatus.PAID);
 
-        when(reservationService.getReservationsByCustomer(10L)).thenReturn(List.of(dto));
+        Mockito.when(reservationService.getReservationsByCustomer(10L)).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/reservations/customer/10"))
                 .andExpect(status().isOk())
