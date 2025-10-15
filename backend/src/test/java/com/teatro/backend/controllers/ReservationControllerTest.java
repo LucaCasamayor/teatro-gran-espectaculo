@@ -92,19 +92,19 @@ class ReservationControllerTest {
                 .andExpect(jsonPath("$.status").value("PENDING"));
     }
 
-    @Test
-    void shouldMarkReservationAsPaid() throws Exception {
-        ReservationDTO dto = new ReservationDTO();
-        dto.setId(1L);
-        dto.setStatus(ReservationStatus.PAID);
-        dto.setPaidAt(LocalDateTime.now());
-
-        when(reservationService.markAsPaid(1L)).thenReturn(dto);
-
-        mockMvc.perform(patch("/api/reservations/1/pay"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("PAID"));
-    }
+//    @Test
+//    void shouldMarkReservationAsPaid() throws Exception {
+//        ReservationDTO dto = new ReservationDTO();
+//        dto.setId(1L);
+//        dto.setStatus(ReservationStatus.PAID);
+//        dto.setPaidAt(LocalDateTime.now());
+//
+//        when(reservationService.markAsPaid(1L)).thenReturn(dto);
+//
+//        mockMvc.perform(patch("/api/reservations/1/pay"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.status").value("PAID"));
+//    }
 
     @Test
     void shouldDeleteReservation() throws Exception {

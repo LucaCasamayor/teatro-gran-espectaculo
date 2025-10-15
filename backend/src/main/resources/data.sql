@@ -30,7 +30,7 @@ VALUES
 INSERT INTO reservation (customer_id, event_id, status, attendee_name, attended_by, created_by_admin, loyalty_free, total, created_at, paid_at, active)
 VALUES
     (1, 1, 'PAID', 'Luca Casamayor', 'Admin1', TRUE, FALSE, 10000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-    (2, 2, 'PENDING', 'María Gómez', 'Admin2', TRUE, TRUE, 0.00, CURRENT_TIMESTAMP, NULL, TRUE),
+    (2, 2, 'PENDING', 'María Gómez', 'Admin2', TRUE, TRUE, 10000.00, CURRENT_TIMESTAMP, NULL, TRUE),
     (3, 3, 'PAID', 'Carlos Pérez', 'Admin3', TRUE, FALSE, 8000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
     (4, 4, 'PENDING', 'Ana Torres', 'Admin1', TRUE, FALSE, 6000.00, CURRENT_TIMESTAMP, NULL, TRUE);
 

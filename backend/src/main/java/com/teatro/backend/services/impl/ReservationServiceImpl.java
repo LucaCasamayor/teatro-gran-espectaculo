@@ -12,14 +12,17 @@ import com.teatro.backend.repositories.EventRepository;
 import com.teatro.backend.repositories.ReservationRepository;
 import com.teatro.backend.repositories.TicketOptionRepository;
 import com.teatro.backend.services.ReservationService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
@@ -100,29 +103,29 @@ public class ReservationServiceImpl implements ReservationService {
 
 
 
-    @Override
-    @Transactional
-    public ReservationDTO markAsPaid(Long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
-
-        if (reservation.getStatus() == ReservationStatus.PAID) {
-            throw new IllegalStateException("Reservation already marked as paid");
-        }
-
-        reservation.markAsPaid();
-
-        Customer customer = reservation.getCustomer();
-        if (reservation.getLoyaltyFree()) {
-            customer.resetStreak();
-        } else {
-            customer.incrementAttendance();
-        }
-        customerRepository.save(customer);
-
-        Reservation updated = reservationRepository.save(reservation);
-        return convertToDTO(updated);
-    }
+//    @Override
+//    @Transactional
+//    public ReservationDTO markAsPaid(Long id) {
+//        Reservation reservation = reservationRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
+//
+//        if (reservation.getStatus() == ReservationStatus.PAID) {
+//            throw new IllegalStateException("Reservation already marked as paid");
+//        }
+//
+//        reservation.markAsPaid();
+//
+//        Customer customer = reservation.getCustomer();
+//        if (reservation.getLoyaltyFree()) {
+//            customer.resetStreak();
+//        } else {
+//            customer.incrementAttendance();
+//        }
+//        customerRepository.save(customer);
+//
+//        Reservation updated = reservationRepository.save(reservation);
+//        return convertToDTO(updated);
+//    }
 
     @Override
     @Transactional(readOnly = true)
@@ -152,6 +155,29 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setActive(false);
         reservationRepository.save(reservation);
     }
+
+    public ReservationDTO updateReservationStatus(Long id, Map<String, Object> updates) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada"));
+
+        if (updates.containsKey("status")) {
+            String newStatus = updates.get("status").toString();
+            reservation.setStatus(ReservationStatus.valueOf(newStatus));
+        }
+
+        if (updates.containsKey("paidAt")) {
+            Object paidAtValue = updates.get("paidAt");
+            if (paidAtValue == null) {
+                reservation.setPaidAt(null);
+            } else {
+                reservation.setPaidAt(LocalDateTime.now());
+            }
+        }
+
+        reservationRepository.save(reservation);
+        return convertToDTO(reservation);
+    }
+
 
     private ReservationDTO convertToDTO(Reservation reservation) {
         ReservationDTO dto = new ReservationDTO();

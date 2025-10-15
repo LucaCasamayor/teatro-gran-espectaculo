@@ -123,58 +123,58 @@ class ReservationServiceImplTest {
         verify(reservationRepository, never()).save(any());
     }
 
-    @Test
-    void shouldMarkReservationAsPaidAndUpdateCustomer() {
-        Customer customer = new Customer();
-        customer.setId(10L);
-        customer.setFirstName("Luca");
-        customer.setLastName("Casamayor");
-        customer.setActive(true);
-        customer.setCurrentStreak(0);
-        customer.setTotalAttendances(0);
-        customer.setLoyaltyFree(false);
-        customer.setRegistrationDate(LocalDateTime.now());
+//    @Test
+//    void shouldMarkReservationAsPaidAndUpdateCustomer() {
+//        Customer customer = new Customer();
+//        customer.setId(10L);
+//        customer.setFirstName("Luca");
+//        customer.setLastName("Casamayor");
+//        customer.setActive(true);
+//        customer.setCurrentStreak(0);
+//        customer.setTotalAttendances(0);
+//        customer.setLoyaltyFree(false);
+//        customer.setRegistrationDate(LocalDateTime.now());
+//
+//        Event event = new Event();
+//        event.setId(20L);
+//        event.setTitle("Obra de Teatro");
+//
+//        Reservation reservation = new Reservation();
+//        reservation.setId(1L);
+//        reservation.setCustomer(customer);
+//        reservation.setEvent(event);
+//        reservation.setStatus(ReservationStatus.PENDING);
+//        reservation.setLoyaltyFree(false);
+//        reservation.setItems(List.of());
+//        reservation.setTotal(BigDecimal.ZERO);
+//        reservation.setActive(true);
+//
+//        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+//        when(reservationRepository.save(any(Reservation.class)))
+//                .thenAnswer(inv -> inv.getArgument(0));
+//        when(customerRepository.save(any(Customer.class)))
+//                .thenAnswer(inv -> inv.getArgument(0));
+//
+//        ReservationDTO dto = reservationService.markAsPaid(1L);
+//
+//        assertNotNull(dto);
+//        assertEquals(ReservationStatus.PAID, reservation.getStatus());
+//        verify(customerRepository, times(1)).save(any(Customer.class));
+//        verify(reservationRepository, times(1)).save(any(Reservation.class));
+//    }
 
-        Event event = new Event();
-        event.setId(20L);
-        event.setTitle("Obra de Teatro");
 
-        Reservation reservation = new Reservation();
-        reservation.setId(1L);
-        reservation.setCustomer(customer);
-        reservation.setEvent(event);
-        reservation.setStatus(ReservationStatus.PENDING);
-        reservation.setLoyaltyFree(false);
-        reservation.setItems(List.of());
-        reservation.setTotal(BigDecimal.ZERO);
-        reservation.setActive(true);
-
-        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
-        when(reservationRepository.save(any(Reservation.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-        when(customerRepository.save(any(Customer.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-        ReservationDTO dto = reservationService.markAsPaid(1L);
-
-        assertNotNull(dto);
-        assertEquals(ReservationStatus.PAID, reservation.getStatus());
-        verify(customerRepository, times(1)).save(any(Customer.class));
-        verify(reservationRepository, times(1)).save(any(Reservation.class));
-    }
-
-
-    @Test
-    void shouldThrowWhenReservationAlreadyPaid() {
-        Reservation reservation = new Reservation();
-        reservation.setId(1L);
-        reservation.setStatus(ReservationStatus.PAID);
-        reservation.setCustomer(customer);
-
-        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
-
-        assertThrows(IllegalStateException.class, () -> reservationService.markAsPaid(1L));
-    }
+//    @Test
+//    void shouldThrowWhenReservationAlreadyPaid() {
+//        Reservation reservation = new Reservation();
+//        reservation.setId(1L);
+//        reservation.setStatus(ReservationStatus.PAID);
+//        reservation.setCustomer(customer);
+//
+//        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+//
+//        assertThrows(IllegalStateException.class, () -> reservationService.markAsPaid(1L));
+//    }
 
     @Test
     void shouldMarkReservationInactive() {

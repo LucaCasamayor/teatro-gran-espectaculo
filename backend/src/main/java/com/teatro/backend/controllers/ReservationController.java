@@ -8,10 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reservations")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -32,10 +34,10 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.createReservation(request));
     }
 
-    @PatchMapping("/{id}/pay")
-    public ResponseEntity<ReservationDTO> markAsPaid(@PathVariable Long id) {
-        return ResponseEntity.ok(reservationService.markAsPaid(id));
-    }
+//    @PatchMapping("/{id}/pay")
+//    public ResponseEntity<ReservationDTO> markAsPaid(@PathVariable Long id) {
+//        return ResponseEntity.ok(reservationService.markAsPaid(id));
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
@@ -47,4 +49,12 @@ public class ReservationController {
     public ResponseEntity<List<ReservationDTO>> getReservationsByCustomer(@PathVariable Long customerId) {
         return ResponseEntity.ok(reservationService.getReservationsByCustomer(customerId));
     }
+    @PatchMapping("/{id}")
+    public ResponseEntity<ReservationDTO> updateStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        return ResponseEntity.ok(reservationService.updateReservationStatus(id, updates));
+    }
+
 }

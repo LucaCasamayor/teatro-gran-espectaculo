@@ -1,0 +1,55 @@
+.dialog-container {
+  min-width: 320px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--mat-sys-on-surface);
+  }
+
+  p {
+    margin: 0.5rem 0 0 0;
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  .icon-warning {
+    color: var(--mat-sys-primary);
+    font-size: 28px;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+
+  button {
+    border-radius: 6px;
+    text-transform: none;
+    font-weight: 500;
+    padding: 0.4rem 1.2rem;
+  }
+
+  button[color='primary'] {
+    background-color: var(--mat-sys-primary);
+    color: white;
+
+    &:hover {
+      background-color: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+    }
+  }
+}

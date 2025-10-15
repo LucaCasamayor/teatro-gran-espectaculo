@@ -1,0 +1,67 @@
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+
+  h2 {
+    font-weight: 600;
+    margin: 0;
+    color: var(--mat-sys-on-surface);
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+    background-color: var(--mat-sys-primary);
+    color: white;
+    border-radius: 6px;
+    padding: 0.4rem 1rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+    }
+
+    mat-icon {
+      font-size: 20px;
+    }
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-radius: 8px;
+    background-color: var(--mat-sys-surface-container-low);
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  td {
+    padding: 0.8rem 1rem;
+  }
+
+  .status-pending {
+    color: #ff9800;
+    font-weight: 600;
+  }
+
+  .status-paid {
+    color: #2e7d32;
+    font-weight: 600;
+  }
+
+  .status-cancelled {
+    color: #d32f2f;
+    font-weight: 600;
+  }
+}
