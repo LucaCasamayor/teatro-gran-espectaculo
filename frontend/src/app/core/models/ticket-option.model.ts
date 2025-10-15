@@ -4,12 +4,13 @@ export class TicketOption {
   price!: number;
   capacity!: number;
   sold!: number;
+  available?: number;
 
   constructor(init?: Partial<TicketOption>) {
     Object.assign(this, init);
   }
 
   getRemaining(): number {
-    return this.capacity - this.sold;
+    return this.available ?? (this.capacity - this.sold);
   }
 }

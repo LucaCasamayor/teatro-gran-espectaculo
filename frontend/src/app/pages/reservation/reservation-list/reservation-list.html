@@ -7,13 +7,15 @@
   </button>
 </div>
 
+<!-- Mostrar el formulario -->
 @if (showForm) {
   <app-reservation-form
-    (saved)="onReservationCreated()"
+    (reservationCreated)="onReservationCreated()"
     (cancel)="toggleForm()">
   </app-reservation-form>
 }
 
+<!-- Tabla de reservas -->
 <div class="table-container">
   <table
     mat-table
@@ -41,11 +43,20 @@
 
     <!-- Fecha del evento -->
     <ng-container matColumnDef="eventDate">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha del Evento</th>
       <td mat-cell *matCellDef="let row">
-        {{ row.eventDate | date: 'shortDate' }}
+        {{ row.eventDate | date:'dd/MM/yyyy' }}
       </td>
     </ng-container>
+
+    <!-- Entradas -->
+    <ng-container matColumnDef="tickets">
+      <th mat-header-cell *matHeaderCellDef>Entradas</th>
+      <td mat-cell *matCellDef="let row">
+        {{ row.tickets || '—' }}
+      </td>
+    </ng-container>
+
 
     <!-- Total -->
     <ng-container matColumnDef="total">
@@ -62,12 +73,7 @@
         <mat-select
           [value]="row.status"
           (selectionChange)="updatePaymentStatus(row, $event)"
-          [ngClass]="{
-            'status-pending': row.status === 'PENDING',
-            'status-paid': row.status === 'PAID',
-            'status-cancelled': row.status === 'CANCELLED'
-          }"
-        >
+          [disabled]="row.status === 'PAID' || row.status === 'CANCELLED'">
           <mat-option value="PENDING">Pendiente</mat-option>
           <mat-option value="PAID">Pagado</mat-option>
           <mat-option value="CANCELLED">Cancelado</mat-option>
@@ -79,12 +85,19 @@
     <ng-container matColumnDef="paidAt">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de pago</th>
       <td mat-cell *matCellDef="let row">
-        {{ row.paidAt ? (row.paidAt | date:'shortDate') : '—' }}
+        {{ row.paidAt ? (row.paidAt | date:'dd/MM/yyyy') : '—' }}
       </td>
     </ng-container>
 
-    <!-- Header y rows -->
+    <!-- Header y filas -->
     <tr mat-header-row *matHeaderRowDef="cols"></tr>
     <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+
+    <!-- Estado vacío -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" [attr.colspan]="cols.length">
+        No hay reservas registradas todavía.
+      </td>
+    </tr>
   </table>
 </div>

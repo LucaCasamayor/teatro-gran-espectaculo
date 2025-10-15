@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
+import { CurrencyPipe, DatePipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ReservationFormComponent } from '../reservation-form/reservation-form';
@@ -24,6 +24,7 @@ import { Customer } from '../../../core/models/customer.model';
   templateUrl: './reservation-list.html',
   styleUrls: ['./reservation-list.scss'],
   imports: [
+    CommonModule,
     MatTableModule,
     MatSortModule,
     MatInputModule,
@@ -35,14 +36,12 @@ import { Customer } from '../../../core/models/customer.model';
     DatePipe,
     FormsModule,
     CurrencyPipe,
-    ReservationFormComponent,
-    ConfirmDialog,
-    NgClass
+    ReservationFormComponent
   ]
 })
 export class ReservationListComponent implements OnInit, AfterViewInit {
-  cols = ['customerName', 'customerEmail', 'eventTitle', 'eventDate', 'total', 'status', 'paidAt'];
-  dataSource = new MatTableDataSource<Reservation>();
+  cols = ['customerName', 'customerEmail', 'eventTitle', 'eventDate', 'tickets', 'total', 'status', 'paidAt'];
+  dataSource = new MatTableDataSource<any>([]); // siempre array, nunca undefined
   showForm = false;
 
   customers: Customer[] = [];
@@ -57,8 +56,8 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog
   ) {}
 
-  // Ciclo de vida
   ngOnInit(): void {
+    // Cargamos base y luego reservas (si base no está, reintenta)
     this.loadCustomers();
     this.loadEvents();
     this.loadReservations();
@@ -68,6 +67,7 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
+  // ------------------ CARGA BASE ------------------
 
   private loadCustomers(): void {
     this.customerService.getAll().subscribe({
@@ -83,12 +83,22 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // ------------------ CARGA DE RESERVAS ------------------
+
   private loadReservations(): void {
+    // Si aún no están customers/events, reintenta breve
+    if (!this.customers?.length || !this.events?.length) {
+      setTimeout(() => this.loadReservations(), 200);
+      return;
+    }
+
     this.reservationService.getAll().subscribe({
       next: (reservations) => {
         const list = (reservations ?? []).map(r => {
           const customer = this.customers.find(c => c.id === r.customerId);
           const event = this.events.find(e => e.id === r.eventId);
+          const ticketSummary = (r.items ?? []).map(i => `${i.quantity} ${i.ticketOptionName}`)
+            .join(', ');
 
           return {
             ...r,
@@ -96,41 +106,47 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
               `${customer?.firstName ?? ''} ${customer?.lastName ?? ''}`.trim() || `Cliente #${r.customerId}`,
             customerEmail: customer?.email ?? '—',
             eventTitle: event?.title ?? `Evento #${r.eventId}`,
-            eventDate: event?.startDateTime ?? r.createdAt
+            eventDate: event?.startDateTime ?? r.createdAt,
+            tickets: ticketSummary
           };
         });
 
-
-        // Orden: pendientes primero y luego por fecha
-        this.dataSource.data = list.sort((a, b) => {
+        // PENDIENTE primero, luego por fecha (más próxima primero)
+        const sorted = list.sort((a, b) => {
           if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
           if (b.status === 'PENDING' && a.status !== 'PENDING') return 1;
           return new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime();
         });
+
+        // Reasignar array => fuerza update sin detectChanges()
+        this.dataSource.data = [...sorted];
       },
       error: (err) => console.error('Error cargando reservas:', err)
     });
   }
 
-
+  // ------------------ FORM ------------------
 
   toggleForm(): void {
     this.showForm = !this.showForm;
   }
 
   onReservationCreated(): void {
-    this.toggleForm();
-    this.loadReservations();
+    this.showForm = false;
+    this.loadReservations(); // refresco instantáneo
   }
 
-
+  // ------------------ ESTADO ------------------
 
   updatePaymentStatus(row: Reservation, event: MatSelectChange): void {
     const newStatus = event.value;
-    const oldStatus = row.status;
+    const previousStatus = row.status;
 
-    // revertir visualmente hasta confirmar
-    event.source.writeValue(oldStatus);
+    // Si ya está pagado o cancelado, no cambia mas
+    if (previousStatus === 'PAID' || previousStatus === 'CANCELLED') {
+      event.source.value = previousStatus; // restaura visualmente
+      return;
+    }
 
     const dialogRef = this.dialog.open(ConfirmDialog, {
       data: {
@@ -140,17 +156,27 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe((confirmed: boolean | undefined) => {
-      if (!confirmed) return;
+      if (!confirmed) {
+        // Si no confirma, restaurar el valor original en el select
+        event.source.value = previousStatus;
+        return;
+      }
 
+      //actualizar en backend
       this.reservationService.update(row.id, { status: newStatus }).subscribe({
-        next: () => {
-          row.status = newStatus; // solo cambia cuando el backend confirma
-          console.log('✅ Estado actualizado:', newStatus);
+        next: (updated) => {
+          row.status = updated.status;
+          row.paidAt = updated.paidAt;
+          this.dataSource.data = [...this.dataSource.data]; // fuerza rerender
         },
-        error: (err) => console.error('Error actualizando estado:', err)
+        error: (err) => {
+          console.error('Error actualizando estado:', err);
+          event.source.value = previousStatus; // vuelve al estado anterior si falla
+        }
       });
     });
   }
+
 
   getStatusLabel(status: string): string {
     switch (status) {

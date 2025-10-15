@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="generic-form">
+  @for (field of config; track field.controlName) {
+    <mat-form-field appearance="fill">
+      <mat-label>{{ field.label }}</mat-label>
+      <input
+        matInput
+        [type]="field.type || 'text'"
+        [formControlName]="field.controlName"
+        [required]="field.required ?? false"
+      />
+    </mat-form-field>
+  }
+
+  <div class="form-actions">
+    <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </button>
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+  </div>
+</form>

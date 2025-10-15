@@ -1,46 +1,90 @@
-.form-container {
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  animation: fadeIn 0.3s ease-in-out;
+.reservation-form {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 16px 16px 8px;
+  display: block;
 
-  h3 {
+  h2 {
+    margin: 0 0 12px;
     font-weight: 600;
-    margin-bottom: 1rem;
-    color: #333;
   }
 
-  .form-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
 
-    mat-form-field {
-      flex: 1;
+  .section-title {
+    margin: 12px 0 8px;
+    font-weight: 600;
+  }
+
+  .ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ticket-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0,0,0,.12);
+    border-radius: 10px;
+    background: rgba(0,0,0,.02);
+
+    .left {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      gap: 16px;
+      align-items: center;
+
+      .name { font-weight: 600; }
+      .price { opacity: .85; }
+      .avail { font-size: .9rem; opacity: .7; }
+    }
+
+    .right {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+
+      input[matInput] {
+        width: 72px;
+        text-align: center;
+      }
     }
   }
 
-  .form-actions {
+  .total {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 12px;
+    font-size: 1.1rem;
+    margin: 16px 0 8px;
 
-    button {
-      font-weight: 500;
-    }
+    strong { font-size: 1.25rem; }
   }
-}
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .opt {
+    display: flex;
+    flex-direction: column;
+    .email { font-weight: 600; }
+    .name { font-size: .85rem; opacity: .75; }
+  }
+
+  @media (max-width: 780px) {
+    .grid { grid-template-columns: 1fr; }
   }
 }

@@ -6,6 +6,7 @@ export class Customer {
   totalAttendances!: number;
   currentStreak!: number;
   hasFreePass!: boolean;
+  active!: boolean;
 
   constructor(init?: Partial<Customer>) {
     Object.assign(this, init);

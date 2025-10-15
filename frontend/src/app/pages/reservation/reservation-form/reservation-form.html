@@ -1,53 +1,99 @@
-<div class="form-container">
-  <h3>Nueva reserva</h3>
+<mat-card class="reservation-form">
+  <h2>Crear reserva</h2>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="form-row">
-      <!-- Cliente -->
-      <mat-form-field appearance="fill">
-        <mat-label>Cliente</mat-label>
-        <mat-select formControlName="customerId">
-          @if (customers.length > 0) {
-            @for (c of customers; track c.id) {
-              <mat-option [value]="c.id">
-                {{ c.firstName }} {{ c.lastName }} - {{ c.email }}
-              </mat-option>
-            }
-          } @else {
-            <mat-option disabled>No hay clientes disponibles</mat-option>
+    <!-- Top: Email + Nombre asistente -->
+    <div class="grid">
+      <!-- Email (autocompletar). La lista muestra email + nombre; el input muestra sólo email -->
+      <mat-form-field appearance="outline">
+        <mat-label>Email del cliente</mat-label>
+        <input
+          matInput
+          formControlName="customerEmail"
+          [matAutocomplete]="auto"
+          placeholder="Buscar por email"
+        />
+
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCustomerSelected($event.option.value)">
+          @for (c of filteredCustomers; track c.id) {
+            <mat-option [value]="c.email">
+              {{ c.email }} — {{ c.firstName }} {{ c.lastName }}
+            </mat-option>
           }
-        </mat-select>
+        </mat-autocomplete>
       </mat-form-field>
 
-      <!-- Evento -->
-      <mat-form-field appearance="fill">
+
+      <!-- Nombre del asistente (opcional) -->
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre del asistente (opcional)</mat-label>
+        <input matInput formControlName="attendeeName" placeholder="Se usará el del cliente si lo dejás vacío" />
+      </mat-form-field>
+    </div>
+
+    <!-- Evento + Fecha (única por ahora) -->
+    <div class="grid">
+      <mat-form-field appearance="outline">
         <mat-label>Evento</mat-label>
-        <mat-select formControlName="eventId">
-          @if (events.length > 0) {
-            @for (e of events; track e.id) {
-              <mat-option [value]="e.id">
-                {{ e.title }} — {{ e.startDateTime | date:'shortDate' }}
-              </mat-option>
-            }
-          } @else {
-            <mat-option disabled>No hay eventos disponibles</mat-option>
+        <mat-select formControlName="eventId" (selectionChange)="onEventChange($event.value)">
+          @for (e of events; track e.id) {
+            <mat-option [value]="e.id">{{ e.title }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha y hora</mat-label>
+        <input matInput formControlName="eventDateTime" />
+      </mat-form-field>
     </div>
 
-    <!-- Botones -->
-    <div class="form-actions">
-      <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="loading || form.invalid"
-      >
-        {{ loading ? 'Guardando...' : 'Guardar reserva' }}
+    <!-- Entradas -->
+    @if (ticketOptions.length > 0) {
+      <h3 class="section-title">Entradas disponibles</h3>
+
+      <div formArrayName="tickets" class="ticket-list">
+        @for (ctrl of tickets.controls; track ctrl.value.ticketOptionId; let i = $index) {
+          <div [formGroupName]="i" class="ticket-item">
+            <div class="left">
+              <div class="name">{{ ctrl.value.name }}</div>
+              <div class="price">$ {{ ctrl.value.price }}</div>
+              <div class="avail">Disponibles: {{
+                  (ticketOptions[i].available ?? (ticketOptions[i].capacity - (ticketOptions[i].sold ?? 0)))
+                }}</div>
+            </div>
+
+            <div class="right">
+              <button mat-icon-button type="button" (click)="decrease(i)">
+                <mat-icon>remove</mat-icon>
+              </button>
+
+              <input matInput type="number" formControlName="quantity" min="0" />
+
+              <button mat-icon-button type="button" (click)="increase(i)">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Total -->
+    <div class="total">
+      <span>Total</span>
+      <strong>$ {{ total }}</strong>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions">
+      <button mat-stroked-button type="button" (click)="reset()">Cancelar</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || total <= 0">
+        Confirmar reserva
       </button>
-
-      <button mat-button type="button" (click)="onCancel()">Cancelar</button>
     </div>
+
+    <!-- Campo oculto requerido por la API -->
+    <input type="hidden" formControlName="customerId" />
   </form>
-</div>
+</mat-card>

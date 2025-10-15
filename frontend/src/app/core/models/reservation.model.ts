@@ -12,7 +12,7 @@ export interface Reservation {
   customerName: string;
   eventId: number;
   eventTitle: string;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+  status: 'PENDING' | 'PAID' | 'CANCELLED';
   loyaltyFree: boolean;
   total: number;
   createdAt: string;

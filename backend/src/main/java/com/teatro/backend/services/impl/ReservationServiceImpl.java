@@ -131,27 +131,35 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
     }
 
+    @Override
+    @Transactional
     public ReservationDTO updateReservationStatus(Long id, Map<String, Object> updates) {
         Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Reservation not found with id: " + id));
+
+        if (reservation.getStatus() == ReservationStatus.PAID) {
+            throw new IllegalStateException("You cannot modify a reservation that is already paid");
+        }
 
         if (updates.containsKey("status")) {
             String newStatus = updates.get("status").toString();
-            reservation.setStatus(ReservationStatus.valueOf(newStatus));
-        }
+            ReservationStatus statusEnum = ReservationStatus.valueOf(newStatus);
 
-        if (updates.containsKey("paidAt")) {
-            Object paidAtValue = updates.get("paidAt");
-            if (paidAtValue == null) {
-                reservation.setPaidAt(null);
-            } else {
+            reservation.setStatus(statusEnum);
+
+            if (statusEnum == ReservationStatus.PAID) {
                 reservation.setPaidAt(LocalDateTime.now());
+            }
+
+            else if (statusEnum == ReservationStatus.CANCELLED) {
+                reservation.setPaidAt(null);
             }
         }
 
         reservationRepository.save(reservation);
         return convertToDTO(reservation);
     }
+
 
 
     private ReservationDTO convertToDTO(Reservation reservation) {

@@ -17,13 +17,13 @@ VALUES
 
 INSERT INTO ticket_option (event_id, name, price, capacity, sold)
 VALUES
-    (1, 'Entrada General', 5000.00, 100, 0),
+    (1, 'General', 5000.00, 100, 0),
     (1, 'VIP', 9000.00, 30, 5),
     (2, 'Campo', 6000.00, 200, 10),
     (2, 'Platea', 8000.00, 100, 8),
     (3, 'General', 4000.00, 150, 0),
     (3, 'Meet & Greet', 7000.00, 50, 0),
-    (4, 'Entrada General', 3000.00, 120, 0),
+    (4, 'General', 3000.00, 120, 0),
     (4, 'VIP Familiar', 5000.00, 40, 0);
 
 
