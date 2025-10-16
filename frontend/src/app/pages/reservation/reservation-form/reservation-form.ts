@@ -247,6 +247,6 @@ export class ReservationFormComponent implements OnInit {
     this.tickets.clear();
     this.ticketOptions = [];
     this.total = 0;
-    this.cancel.emit(); 
+    this.cancel.emit();
   }
 }

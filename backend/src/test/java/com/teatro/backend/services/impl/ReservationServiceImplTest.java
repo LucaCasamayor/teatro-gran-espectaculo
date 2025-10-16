@@ -371,7 +371,7 @@ class ReservationServiceImplTest {
         reservation.setStatus(ReservationStatus.PENDING);
         reservation.setCustomer(customer);
         reservation.setEvent(event);
-        reservation.setItems(new java.util.ArrayList<>()); 
+        reservation.setItems(new java.util.ArrayList<>());
 
         ReservationDTO dto = new ReservationDTO();
         dto.setCustomerId(1L);

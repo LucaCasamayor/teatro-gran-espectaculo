@@ -1,0 +1,106 @@
+<h2 mat-dialog-title>
+  {{ isEdit ? 'Editar evento' : 'Nuevo evento' }}
+</h2>
+
+<div mat-dialog-content [formGroup]="form" class="form-container">
+
+  <!-- Título -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Título</mat-label>
+    <input matInput formControlName="title" />
+    <mat-error *ngIf="hasError('title', 'required')">
+      El título es obligatorio
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Tipo de evento -->
+  <mat-form-field appearance="outline" class="half-width">
+    <mat-label>Tipo de evento</mat-label>
+    <mat-select formControlName="type">
+      @for (t of tiposEvento; track t.value) {
+        <mat-option [value]="t.value">{{ t.label }}</mat-option>
+      }
+    </mat-select>
+    <mat-error *ngIf="hasError('type', 'required')">
+      El tipo de evento es obligatorio
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Fecha + horas -->
+  <div class="datetime-row">
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Fecha</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="startDate" />
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="hasError('startDate', 'required')">
+        La fecha es obligatoria
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Hora de inicio</mat-label>
+      <input matInput type="time" formControlName="startTime" />
+      <mat-error *ngIf="hasError('startTime', 'required')">
+        La hora de inicio es obligatoria
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Hora de finalización</mat-label>
+      <input matInput type="time" formControlName="endTime" />
+      <mat-error *ngIf="hasError('endTime', 'required')">
+        La hora de finalización es obligatoria
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- Descripción -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Descripción</mat-label>
+    <textarea matInput rows="3" formControlName="description"></textarea>
+  </mat-form-field>
+
+  <!-- Entradas -->
+  <div class="tickets-section" formArrayName="ticketOptions">
+    <h3>Tipos de entrada</h3>
+
+    @for (_ of ticketOptions.controls; let i = $index; track i) {
+      <div class="ticket-group" [formGroupName]="i">
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo</mat-label>
+          <input matInput formControlName="name" readonly />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Precio</mat-label>
+          <input matInput type="number" formControlName="price" />
+          <mat-error *ngIf="hasErrorTicket(i, 'price', 'required')">
+            El precio es obligatorio
+          </mat-error>
+          <mat-error *ngIf="hasErrorTicket(i, 'price', 'min')">
+            El precio debe ser mayor o igual a 0
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Capacidad</mat-label>
+          <input matInput type="number" formControlName="capacity" />
+          <mat-error *ngIf="hasErrorTicket(i, 'capacity', 'required')">
+            La capacidad es obligatoria
+          </mat-error>
+          <mat-error *ngIf="hasErrorTicket(i, 'capacity', 'min')">
+            La capacidad debe ser al menos 1
+          </mat-error>
+        </mat-form-field>
+      </div>
+    }
+  </div>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-stroked-button color="warn" (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="onSubmit()">
+    {{ isEdit ? 'Guardar cambios' : 'Crear evento' }}
+  </button>
+</div>

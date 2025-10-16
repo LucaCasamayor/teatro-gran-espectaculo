@@ -6,11 +6,15 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app/app.routes';
 import {AppComponent} from './app/app';
 import { provideHttpClient } from '@angular/common/http';
+import {importProvidersFrom} from '@angular/core';
+import {MAT_DATE_LOCALE, MatNativeDateModule} from '@angular/material/core';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
     provideAnimations(),
-    provideHttpClient()
+    provideHttpClient(),
+    importProvidersFrom(MatNativeDateModule),
+    { provide: MAT_DATE_LOCALE, useValue: 'es-AR' }
   ]
-});
+}).catch(err => console.error(err));

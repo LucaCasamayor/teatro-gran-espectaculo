@@ -4,7 +4,6 @@ DROP TABLE IF EXISTS ticket_option;
 DROP TABLE IF EXISTS event;
 DROP TABLE IF EXISTS customer;
 
-
 CREATE TABLE customer (
                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
                           first_name VARCHAR(100) NOT NULL,
@@ -17,7 +16,6 @@ CREATE TABLE customer (
                           active BOOLEAN DEFAULT TRUE
 );
 
-
 CREATE TABLE event (
                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
                        title VARCHAR(200) NOT NULL,
@@ -29,7 +27,6 @@ CREATE TABLE event (
                        active BOOLEAN DEFAULT TRUE
 );
 
-
 CREATE TABLE ticket_option (
                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                event_id BIGINT NOT NULL,
@@ -40,8 +37,6 @@ CREATE TABLE ticket_option (
                                version INT DEFAULT 0,
                                CONSTRAINT fk_ticket_event FOREIGN KEY (event_id) REFERENCES event(id)
 );
-
-
 
 CREATE TABLE reservation (
                              id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -59,7 +54,6 @@ CREATE TABLE reservation (
                              CONSTRAINT fk_reservation_customer FOREIGN KEY (customer_id) REFERENCES customer(id),
                              CONSTRAINT fk_reservation_event FOREIGN KEY (event_id) REFERENCES event(id)
 );
-
 
 CREATE TABLE reservation_item (
                                   id BIGINT AUTO_INCREMENT PRIMARY KEY,
