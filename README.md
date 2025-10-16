@@ -1,53 +1,37 @@
-# Teatro Gran Espectáculo - Sistema de Gestión de Reservas
-
-## Contexto
-El **Teatro Gran Espectáculo** organiza obras de teatro, conciertos y conferencias.  
-Hasta ahora, la gestión de reservas se realizaba manualmente, generando errores, sobreventas y confusión entre los asistentes.  
-El objetivo de este sistema es **automatizar la administración de eventos y reservas**, optimizando el control de disponibilidad, pagos y fidelización de clientes.
-
----
-
-## Problemas Detectados
-- Reservas manuales sin control de disponibilidad.  
-- Clientes que reservan y olvidan pagar.  
-- Falta de registro histórico de clientes y asistencias.  
-- Necesidad de premiar a los clientes frecuentes con **pases gratuitos**.  
-
----
+# Prueba Técnica - Sistema de Gestión de Reservas
 
 ## Objetivos del Sistema
 1. **Registrar eventos** (teatro, recitales, conferencias) con tipos de entradas diferenciadas.  
-2. **Administrar reservas** de manera segura y controlada, evitando sobreventas.  
-3. **Actualizar automáticamente la disponibilidad** de entradas en tiempo real.  
+2. **Administrar reservas**, evitando sobreventas.   
 4. **Controlar pagos y estados de reserva** (`PENDING`, `PAID`, `CANCELLED`).  
 5. **Implementar fidelización:** cada 5 asistencias en un año calendario → el siguiente evento es gratuito.  
-6. **Cancelar automáticamente reservas no pagadas** cuando inicia el evento.
 
 ---
 
 ## Arquitectura del Sistema
 
-### 🖥️ Backend
+# Backend
 - **Lenguaje:** Java 17  
 - **Framework:** Spring Boot 3.x  
 - **Persistencia:** Spring Data JPA  
 - **Base de datos:** H2 (para pruebas, adaptable a MySQL/PostgreSQL)  
-- **Documentación:** Swagger UI  
 - **Testing:** JUnit5 + Mockito  
 
 ---
+# Frontend
 
-## Modelo de Dominio (Diagrama de Clases)
+### Tecnologías y Frameworks
+- **Framework principal:** Angular 17 
+- **UI Library:** Angular Material
+- **Lenguaje:** TypeScript
+- **Estilos:** SCSS modular
+- **Comunicación con backend:** HttpClient (REST API)
+- **Build Tool:** Angular CLI
+- **Servidor de desarrollo:** `ng serve` (puerto 4200 por defecto)
 
-| Entidad | Descripción |
-|----------|--------------|
-| **Customer** | Datos del cliente (nombre, apellido, email, fidelización, pase gratuito, actividad). |
-| **Event** | Representa cada espectáculo con su tipo, fecha y estado (`SCHEDULED`, `CANCELLED`, `FINISHED`). |
-| **TicketOption** | Tipos de entrada del evento (general, VIP, platea, palco, etc.). Incluye control de stock y versión. |
-| **Reservation** | Reserva de entradas realizada por el empleado. Contiene estado (`PENDING`, `PAID`, `CANCELLED`), monto total, fecha y cliente. |
-| **ReservationItem** | Detalle de cada ticket reservado. |
+### Modelo de Dominio (Diagrama de Clases)
 
-📄 *Ver diagrama completo en [`Clases.puml`](./docs/uml/diagramaClases.puml)*
+📄 *Ver diagrama completo en [`Clases.puml`](./backend/docs/uml/diagramaClases.puml) elaboración propia*
 
 ---
 
@@ -59,7 +43,7 @@ El objetivo de este sistema es **automatizar la administración de eventos y res
 5. Si llega la fecha y sigue `PENDING` → el sistema la **cancela automáticamente** (`CANCELLED`).  
 6. Al marcar una reserva como `PAID`, se actualiza la fidelización del cliente.  
 
-📄 *Ver diagrama completo en [`diagramaNegocio.puml`](./docs/uml/diagramaNegocio.puml)*
+📄 *Ver diagrama completo en [`diagramaNegocio.puml`](./backend/docs/uml/diagramaNegocio.puml)  elaboración propia*
 
 ---
 
@@ -74,7 +58,7 @@ username=sa
 password=
 
 ```
- 📄 *Ver diagrama entidad-relacion en [`diagrama-er.puml`](./docs/uml/diagrama-er.puml)*
+ 📄 *Ver diagrama entidad-relacion en [`diagrama-er.puml`](./backend/docs/uml/diagrama-er.puml)  elaboración propia*
 
 📘 *Los archivos `schema.sql` y `data.sql` crean y cargan la base de datos inicial.*
 
@@ -88,14 +72,13 @@ Antes de ejecutar el proyecto, asegurate de contar con las siguientes versiones 
 | **Java JDK** | 17                         | Requerido para compilar y ejecutar el proyecto Spring Boot. |
 | **Maven**    | 3.9.0                      | Utilizado para compilar, testear y empaquetar la aplicación. |
 | **Spring Boot** | 3.3.4                   | Framework principal del backend. |
-| **H2 Database** | 2.2.224 (runtime)       | Base de datos en memoria para desarrollo y testing. |
+| **H2 Database** | 2.2.224       | Base de datos en memoria para desarrollo y testing. |
 | **Lombok** | 1.18.34 | Genera automáticamente constructores, getters/setters y logs. |
 | **ModelMapper** | 3.2.0 | Mapeo entre entidades y DTOs. |
 | **Springdoc OpenAPI** | 2.6.0 | Generación automática de documentación Swagger UI. |
 
->  Si usás IntelliJ IDEA o VS Code, asegurate de tener el plugin de **Lombok** habilitado para evitar errores de compilación en tiempo de diseño.
 
-## Ejecución del Proyecto
+## Ejecución del Backend
 
 ###  Comandos
 ```bash
@@ -109,35 +92,135 @@ Una vez iniciado el backend:
 ```
 http://localhost:8080/swagger-ui/index.html
 ```
+### Ejecución del Frontend
+
+```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar el servidor de desarrollo
+npm start
+```
+
+Luego abrir en el navegador:
+```
+http://localhost:4200
+```
 
 ---
 
-## ✅ Endpoints Principales
-
-| Método | Endpoint | Descripción |
-|--------|-----------|-------------|
-| `GET` | `/api/events` | Listar eventos |
-| `POST` | `/api/events` | Crear nuevo evento |
-| `PUT` | `/api/events/{id}` | Modificar evento |
-| `PATCH` | `/api/events/{id}/cancel` | Cancelar evento |
-| `GET` | `/api/customers` | Listar clientes |
-| `POST` | `/api/customers` | Crear cliente |
-| `PUT` | `/api/customers/{id}` | Actualizar cliente |
-| `DELETE` | `/api/customers/{id}` | Baja lógica |
-| `GET` | `/api/reservations` | Listar reservas |
-| `POST` | `/api/reservations` | Crear reserva |
-| `PUT` | `/api/reservations/{id}/pay` | Marcar como pagada |
-| `DELETE` | `/api/reservations/{id}` | Baja lógica |
-
----
-
-## 🧾 Diagramas Incluidos
-- `Clases.puml ` → Modelo de dominio completo  
-- `diagramaNegocio.puml ` → Flujo del negocio interno  
+## Diagramas Incluidos
+- `diagramaClases.puml ` → Modelo de dominio  
+- `diagramaNegocio.puml ` → Flujo del negocio interno
+- `diagrama-er.puml ` → Diagrama entidad-relación 
 - `schema.sql` / `data.sql` → Generación y carga inicial de la BDD H2.
 
+### 📁 Estructura del proyecto (Backend)
+```
+src/
+└── main/
+├── java/
+│ └── com/teatro/backend/
+│ ├── config/ # Configuración general de la app
+│ │
+│ ├── controllers/ # Controladores REST
+│ │ ├── CustomerController.java
+│ │ ├── EventController.java
+│ │ └── ReservationController.java
+│ │
+│ ├── exceptions/ # Manejo global de excepciones
+│ │ └── GlobalExceptionHandler.java
+│ │
+│ ├── models/
+│ │ ├── dtos/ # Data Transfer Objects (DTOs)
+│ │ │ ├── CustomerDTO.java
+│ │ │ ├── EventDTO.java
+│ │ │ ├── ReservationDTO.java
+│ │ │ ├── ReservationItemDTO.java
+│ │ │ └── TicketOptionDTO.java
+│ │ │
+│ │ ├── entities/ # Entidades JPA
+│ │ │ ├── Customer.java
+│ │ │ ├── Event.java
+│ │ │ ├── Reservation.java
+│ │ │ ├── ReservationItem.java
+│ │ │ └── TicketOption.java
+│ │ │
+│ │ └── enums/ # Enums del sistema
+│ │ ├── EventStatus.java
+│ │ ├── EventType.java
+│ │ └── ReservationStatus.java
+│ │
+│ ├── repositories/ # Interfaces de acceso a datos
+│ │ ├── CustomerRepository.java
+│ │ ├── EventRepository.java
+│ │ ├── ReservationRepository.java
+│ │ └── TicketOptionRepository.java
+│ │
+│ ├── services/ # Servicios (interfaces y lógica de negocio)
+│ │ ├── CustomerService.java
+│ │ ├── EventService.java
+│ │ ├── ReservationService.java
+│ │ │
+│ │ └── impl/ # Implementaciones concretas de servicios
+│ │ ├── CustomerServiceImpl.java
+│ │ ├── EventServiceImpl.java
+│ │ └── ReservationServiceImpl.java
+│ │
+│ └── BackendApplication.java # Clase principal 
+│
+└── resources/
+├── application.properties # Configuración de la aplicación
+├── data.sql # Datos iniciales (seed)
+├── schema.sql # Estructura de base de datos
+└── test/ # Tests unitarios y de integración
+```
+### 📁 Estructura del proyecto Front
+
+```
+src/
+└── app/
+├── core/ # Lógica central
+│ ├── models/ # Modelos de datos
+│ └── services/ # Servicios HTTP
+│
+├── layout/ # Estructura visual general
+│
+├── pages/ # Páginas principales del sistema
+│ ├── customers/ # Módulo de clientes
+│ │ ├── customer-form/ 
+│ │ └── customer-list/
+│ │
+│ ├── dashboard/ # Panel principal
+│ │
+│ ├── events/ # Módulo de eventos
+│ │ ├── event-form/ 
+│ │ └── event-list/ 
+│ │
+│ └── reservation/ # Módulo de reservas
+│ ├── reservation-form/ 
+│ └── reservation-list/ 
+│
+├── shared/ # Componentes genéricos reutilizables
+│ ├── confirm-dialog/
+│ ├── generic-form/ 
+│ └── generic-table/ 
+```
+
 ---
- 
-### 💻 Frontend 
-- **Framework:** Angular  
-- **Objetivo:** interfaz interna para empleados del teatro (no para clientes externos).
+
+### Funcionalidades destacadas
+
+- **Gestión completa de eventos**  
+  Crear, editar, cancelar y listar eventos.  
+  Soporta distintos tipos:  
+  - Obras de teatro → Entradas *General* y *VIP*  
+  - Recitales → *Campo*, *Platea*, *Palco*  
+  - Conferencias → *General* y *Meet & Greet*
+
+- **Gestión de reservas y clientes**  
+  - Visualización y administración de clientes.  
+  - Creación de reservas asociadas a eventos.  
+  - Cálculo automático de descuentos por fidelización. 
+---
+
