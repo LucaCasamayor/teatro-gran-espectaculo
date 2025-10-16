@@ -290,5 +290,124 @@ class ReservationServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> reservationService.getReservationsByCustomer(1L));
         verify(reservationRepository, never()).findByCustomerId(anyLong());
     }
+    @Test
+    void shouldThrowWhenMissingStatusInUpdate() {
+        Reservation reservation = new Reservation();
+        reservation.setId(1L);
+        reservation.setStatus(ReservationStatus.PENDING);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+
+        assertThrows(IllegalArgumentException.class, () ->
+                reservationService.updateReservationStatus(1L, Map.of())); // sin 'status'
+    }
+
+    @Test
+    void shouldThrowWhenInvalidStatusValue() {
+        Reservation reservation = new Reservation();
+        reservation.setId(1L);
+        reservation.setStatus(ReservationStatus.PENDING);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+
+        assertThrows(IllegalArgumentException.class, () ->
+                reservationService.updateReservationStatus(1L, Map.of("status", "INVALID_STATUS")));
+    }
+
+    @Test
+    void shouldThrowWhenStatusAlreadyPaid() {
+        Reservation reservation = new Reservation();
+        reservation.setId(1L);
+        reservation.setStatus(ReservationStatus.PAID);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+
+        assertThrows(IllegalStateException.class, () ->
+                reservationService.updateReservationStatus(1L, Map.of("status", "CANCELLED")));
+    }
+
+    @Test
+    void shouldUpdateReservationStatusToCancelled() {
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setFirstName("Luca");
+        customer.setLastName("Casamayor");
+
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("Obra");
+
+        Reservation reservation = new Reservation();
+        reservation.setId(1L);
+        reservation.setCustomer(customer);
+        reservation.setEvent(event);
+        reservation.setStatus(ReservationStatus.PENDING);
+        reservation.setPaidAt(LocalDateTime.now());
+        reservation.setItems(List.of());
+
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+        when(reservationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        ReservationDTO dto = reservationService.updateReservationStatus(1L, Map.of("status", "CANCELLED"));
+
+        assertEquals(ReservationStatus.CANCELLED, dto.getStatus());
+        assertNull(reservation.getPaidAt(), "paidAt debe quedar en null al cancelar");
+        verify(reservationRepository).save(reservation);
+    }
+    @Test
+    void shouldUpdateReservationSuccessfully() {
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setFirstName("Luca");
+        customer.setLastName("Casamayor");
+
+        Event event = new Event();
+        event.setId(2L);
+        event.setTitle("Evento");
+
+        TicketOption option = new TicketOption();
+        option.setId(3L);
+        option.setPrice(new BigDecimal("200"));
+
+        Reservation reservation = new Reservation();
+        reservation.setId(10L);
+        reservation.setStatus(ReservationStatus.PENDING);
+        reservation.setCustomer(customer);
+        reservation.setEvent(event);
+        reservation.setItems(new java.util.ArrayList<>()); 
+
+        ReservationDTO dto = new ReservationDTO();
+        dto.setCustomerId(1L);
+        dto.setEventId(2L);
+        dto.setAttendeeName("Juan");
+        dto.setItems(List.of(
+                new com.teatro.backend.models.dtos.ReservationItemDTO(null, 3L, "VIP", 2, BigDecimal.ZERO)
+        ));
+
+        when(reservationRepository.findById(10L)).thenReturn(Optional.of(reservation));
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(eventRepository.findById(2L)).thenReturn(Optional.of(event));
+        when(ticketOptionRepository.findById(3L)).thenReturn(Optional.of(option));
+        when(reservationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        ReservationDTO result = reservationService.updateReservation(10L, dto);
+
+        assertEquals("Juan", result.getAttendeeName());
+        assertEquals(1, reservation.getItems().size());
+        verify(reservationRepository).save(any());
+    }
+
+
+    @Test
+    void shouldThrowWhenUpdatingPaidReservation() {
+        Reservation reservation = new Reservation();
+        reservation.setId(10L);
+        reservation.setStatus(ReservationStatus.PAID);
+        when(reservationRepository.findById(10L)).thenReturn(Optional.of(reservation));
+
+        ReservationDTO dto = new ReservationDTO();
+        dto.setCustomerId(1L);
+        dto.setEventId(2L);
+
+        assertThrows(IllegalStateException.class, () -> reservationService.updateReservation(10L, dto));
+    }
+
 
 }
