@@ -1,90 +1,206 @@
 .reservation-form {
-  max-width: 900px;
-  margin: 24px auto;
-  padding: 16px 16px 8px;
-  display: block;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 32px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 
   h2 {
-    margin: 0 0 12px;
+    margin: 0;
+    font-size: 1.4rem;
     font-weight: 600;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 8px;
+    color: #2c2c2c;
+    text-align: center;
   }
 
   .section-title {
-    margin: 12px 0 8px;
+    margin-top: 12px;
+    font-size: 1.1rem;
     font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 4px;
   }
 
-  .ticket-list {
+  form {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-  }
+    gap: 24px;
 
-  .ticket-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border: 1px solid rgba(0,0,0,.12);
-    border-radius: 10px;
-    background: rgba(0,0,0,.02);
-
-    .left {
+    .grid {
       display: grid;
-      grid-template-columns: auto auto auto;
+      grid-template-columns: 1fr 1fr;
       gap: 16px;
-      align-items: center;
 
-      .name { font-weight: 600; }
-      .price { opacity: .85; }
-      .avail { font-size: .9rem; opacity: .7; }
+      mat-form-field {
+        width: 100%;
+      }
     }
 
-    .right {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    /* === ENTRADAS DISPONIBLES === */
+    .ticket-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
 
-      input[matInput] {
-        width: 72px;
-        text-align: center;
+      .ticket-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fafafa;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #f3f3f3;
+        }
+
+        .left {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          .name {
+            font-weight: 600;
+            color: #333;
+          }
+
+          .price {
+            color: #3f51b5;
+            font-weight: 500;
+          }
+
+          .avail {
+            font-size: 0.85rem;
+            color: #777;
+          }
+        }
+
+        .right {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          input {
+            width: 60px;
+            text-align: center;
+            font-size: 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px;
+            outline: none;
+
+            &:focus {
+              border-color: #3f51b5;
+            }
+          }
+
+          button[mat-icon-button] {
+            width: 32px;
+            height: 32px;
+
+            mat-icon {
+              font-size: 20px;
+              color: #555;
+            }
+
+            &:hover mat-icon {
+              color: #000;
+            }
+          }
+        }
+      }
+    }
+
+    /* === TOTAL === */
+    .total {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #333;
+      border-top: 2px solid #eee;
+      padding-top: 12px;
+
+      strong {
+        font-size: 1.25rem;
+        color: #3f51b5;
+      }
+    }
+
+    /* === ACCIONES === */
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+
+      button {
+        font-weight: 500;
+        border-radius: 6px;
+        min-width: 130px;
+      }
+
+      button[mat-stroked-button] {
+        color: #444;
+        border-color: #ccc;
+
+        &:hover {
+          border-color: #999;
+        }
+      }
+
+      button[mat-raised-button] {
+        box-shadow: none;
+
+        &:disabled {
+          opacity: 0.6;
+        }
       }
     }
   }
+}
 
-  .total {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    font-size: 1.1rem;
-    margin: 16px 0 8px;
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .reservation-form {
+    margin: 24px;
+    padding: 20px;
 
-    strong { font-size: 1.25rem; }
-  }
+    form {
+      gap: 16px;
 
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 8px;
-  }
+      .grid {
+        grid-template-columns: 1fr;
+      }
 
-  .opt {
-    display: flex;
-    flex-direction: column;
-    .email { font-weight: 600; }
-    .name { font-size: .85rem; opacity: .75; }
-  }
+      .ticket-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
 
-  @media (max-width: 780px) {
-    .grid { grid-template-columns: 1fr; }
+        .right {
+          align-self: flex-end;
+        }
+      }
+
+      .actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
   }
 }

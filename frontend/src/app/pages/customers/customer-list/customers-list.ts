@@ -5,6 +5,8 @@ import { Customer } from '../../../core/models/customer.model';
 import { FieldConfig, GenericFormComponent } from '../../../../shared/generic-form/generic-form';
 import { GenericTableComponent } from '../../../../shared/generic-table/generic-table';
 import { MatIcon } from '@angular/material/icon';
+import {MatDialog} from '@angular/material/dialog';
+import {ConfirmDialog} from '../../../../shared/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-customers-list',
@@ -30,7 +32,7 @@ export class CustomersListComponent implements OnInit {
     { key: 'email', label: 'Correo' }
   ];
 
-  constructor(private customerService: CustomerService) {}
+  constructor(private customerService: CustomerService, private dialog : MatDialog) { }
 
   ngOnInit(): void {
     this.loadCustomers();
@@ -68,6 +70,19 @@ export class CustomersListComponent implements OnInit {
   }
 
   deleteCustomer(c: Customer) {
-    this.customerService.delete(c.id).subscribe(() => this.loadCustomers());
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: '400px',
+      data: {
+        title: 'Confirmar eliminación',
+        message: `¿Estás seguro de que querés eliminar a ${c.firstName} ${c.lastName}?`
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.customerService.delete(c.id).subscribe(() => this.loadCustomers());
+      }
+    });
   }
+
 }

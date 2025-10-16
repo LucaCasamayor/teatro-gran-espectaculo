@@ -126,7 +126,7 @@ class CustomerControllerTest {
     void shouldDeleteCustomer() throws Exception {
         Mockito.doNothing().when(customerService).deleteCustomer(1L);
 
-        mockMvc.perform(delete("/api/customers/1"))
+        mockMvc.perform(patch("/api/customers/1/deactivate"))
                 .andExpect(status().isNoContent());
     }
 

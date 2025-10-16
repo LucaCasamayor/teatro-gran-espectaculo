@@ -36,7 +36,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.updateCustomer(id, customerDTO));
     }
 
-    @DeleteMapping("/{id}")
+    @PatchMapping("/{id}/deactivate")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();

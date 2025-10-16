@@ -34,7 +34,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.createReservation(request));
     }
 
-    @DeleteMapping("/{id}")
+    @PatchMapping("/{id}/deactivate")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
         reservationService.deleteReservation(id);
         return ResponseEntity.noContent().build();

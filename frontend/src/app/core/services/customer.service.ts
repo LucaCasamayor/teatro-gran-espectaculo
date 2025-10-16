@@ -26,8 +26,9 @@ export class CustomerService {
   }
 
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.patch<void>(`${this.apiUrl}/${id}/deactivate`, {});
   }
+
 
   getFreePass(): Observable<Customer[]> {
     return this.http.get<Customer[]>(`${this.apiUrl}/free-pass`);

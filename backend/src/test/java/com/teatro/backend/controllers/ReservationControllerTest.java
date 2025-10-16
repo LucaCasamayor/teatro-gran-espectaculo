@@ -112,7 +112,7 @@ class ReservationControllerTest {
     void shouldDeleteReservation() throws Exception {
         Mockito.doNothing().when(reservationService).deleteReservation(1L);
 
-        mockMvc.perform(delete("/api/reservations/1"))
+        mockMvc.perform(patch("/api/reservations/1/deactivate"))
                 .andExpect(status().isNoContent());
     }
 

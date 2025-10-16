@@ -1,6 +1,6 @@
 <section class="events-header">
   <h2>Eventos</h2>
-  <button mat-raised-button color="primary" (click)="onCreate()">
+  <button mat-flat-button color="primary" (click)="onCreate()">
     + Nuevo Evento
   </button>
 </section>
@@ -14,7 +14,7 @@
         <mat-card-header>
           <mat-card-title>{{ event.title }}</mat-card-title>
           <mat-card-subtitle>
-            {{ event.type }} • {{ event.formattedDate }}
+            {{ event.type }} • {{ event.startDateTime | date: 'short' }}
           </mat-card-subtitle>
         </mat-card-header>
 
@@ -42,3 +42,4 @@
     }
   </section>
 }
+

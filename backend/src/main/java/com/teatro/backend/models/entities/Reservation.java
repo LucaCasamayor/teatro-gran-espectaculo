@@ -78,10 +78,5 @@ public class Reservation {
         return this.total;
     }
 
-
-    public void markAsPaid() {
-        this.status = ReservationStatus.PAID;
-        this.paidAt = LocalDateTime.now();
-    }
 }
 

@@ -1,55 +1,103 @@
 .dialog-container {
-  min-width: 320px;
-  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-
-  h2 {
-    margin: 0;
-    font-weight: 600;
-    font-size: 1.2rem;
-    color: var(--mat-sys-on-surface);
-  }
-
-  p {
-    margin: 0.5rem 0 0 0;
-    color: var(--mat-sys-on-surface-variant);
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
+  gap: 20px;
+  padding: 28px 32px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  min-width: 340px;
+  max-width: 420px;
+  font-family: 'Roboto', sans-serif;
 }
 
+/* === HEADER === */
 .dialog-header {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 12px;
 
   .icon-warning {
-    color: var(--mat-sys-primary);
+    color: #fbc02d;
     font-size: 28px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c2c2c;
   }
 }
 
+/* === CONTENIDO === */
+.dialog-content {
+  p {
+    margin: 0;
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+}
+
+/* === ACCIONES === */
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.8rem;
+  gap: 12px;
+  margin-top: 8px;
 
   button {
-    border-radius: 6px;
-    text-transform: none;
     font-weight: 500;
-    padding: 0.4rem 1.2rem;
+    border-radius: 6px;
+    min-width: 100px;
   }
 
-  button[color='primary'] {
-    background-color: var(--mat-sys-primary);
-    color: white;
+  button[mat-stroked-button] {
+    color: #444;
+    border-color: #ccc;
 
     &:hover {
-      background-color: var(--mat-sys-primary-container);
-      color: var(--mat-sys-on-primary-container);
+      border-color: #999;
+    }
+  }
+
+  button[mat-flat-button] {
+    color: #fff;
+    background-color: var(--mat-sys-primary);
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
+}
+/* Evitar scroll horizontal en el diálogo */
+:host {
+  display: block;
+  overflow-x: hidden;
+}
+
+.mat-mdc-dialog-content,
+.dialog-container {
+  overflow-x: hidden !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+
+/* === RESPONSIVE === */
+@media (max-width: 480px) {
+  .dialog-container {
+    padding: 20px 24px;
+    max-width: 90vw;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+
+    button {
+      width: 100%;
     }
   }
 }

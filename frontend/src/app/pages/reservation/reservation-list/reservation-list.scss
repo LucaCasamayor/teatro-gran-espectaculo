@@ -1,67 +1,81 @@
+/* === CONTENEDOR PRINCIPAL === */
+:host {
+  display: block;
+  padding: 40px 60px;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* === HEADER === */
 .list-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.2rem;
+  justify-content: space-between;
+  margin-bottom: 32px;
 
   h2 {
-    font-weight: 600;
     margin: 0;
-    color: var(--mat-sys-on-surface);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #2c2c2c;
+    letter-spacing: 0.3px;
   }
 
   button {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 6px;
     font-weight: 500;
-    background-color: var(--mat-sys-primary);
-    color: white;
     border-radius: 6px;
-    padding: 0.4rem 1rem;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background-color: var(--mat-sys-primary-container);
-      color: var(--mat-sys-on-primary-container);
-    }
 
     mat-icon {
       font-size: 20px;
+      color: #fff;
     }
   }
 }
 
-.table-container {
-  overflow-x: auto;
+/* === FORMULARIO DE RESERVA === */
+app-reservation-form {
+  display: block;
+  margin-bottom: 40px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
 
-  table {
-    width: 100%;
-    border-radius: 8px;
-    background-color: var(--mat-sys-surface-container-low);
+/* === TABLA DE RESERVAS === */
+app-generic-table {
+  display: block;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 12px 0;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  :host {
+    padding: 24px;
   }
 
-  th {
-    font-weight: 600;
-    color: var(--mat-sys-on-surface-variant);
+  .list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    h2 {
+      font-size: 1.2rem;
+    }
+
+    button {
+      align-self: flex-end;
+    }
   }
 
-  td {
-    padding: 0.8rem 1rem;
-  }
-
-  .status-pending {
-    color: #ff9800;
-    font-weight: 600;
-  }
-
-  .status-paid {
-    color: #2e7d32;
-    font-weight: 600;
-  }
-
-  .status-cancelled {
-    color: #d32f2f;
-    font-weight: 600;
+  app-reservation-form {
+    padding: 16px;
   }
 }

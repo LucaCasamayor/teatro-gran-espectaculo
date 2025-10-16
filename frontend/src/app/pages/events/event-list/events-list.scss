@@ -32,14 +32,14 @@ mat-card {
   }
 
   .desc {
-    color: #ccc;
+    color: #151414;
     font-size: 0.95rem;
     margin-bottom: 0.8rem;
   }
 
   .status {
     font-size: 0.9rem;
-    color: #aaa;
+    color: #333333;
   }
 }
 
@@ -55,7 +55,6 @@ mat-card {
 }
 
 
-/* 🔥 Estilo exclusivo del modal de eventos */
 ::ng-deep .event-form-dialog .mat-mdc-dialog-surface {
   width: 1100px !important;
   max-width: 95vw !important;

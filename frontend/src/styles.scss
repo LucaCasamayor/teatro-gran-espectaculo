@@ -50,6 +50,28 @@ html {
     density: 0,
   ));
 }
+/* === BOTONES DE ACCIÓN PRINCIPALES === */
+.primary-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  border-radius: 6px;
+  background-color: var(--mat-sys-primary);
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0 14px;
+  height: 40px;
+
+  mat-icon {
+    font-size: 20px;
+    color: #fff;
+  }
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
 
 body {
   // Default the application to a light color theme. This can be changed to

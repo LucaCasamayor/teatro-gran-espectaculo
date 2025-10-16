@@ -109,7 +109,7 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
           const eventDateFormatted =
             this.datePipe.transform(baseDate, 'dd/MM/yyyy HH:mm') ?? '—';
 
-          // 🕒 Nueva línea: formatear la fecha de pago si existe
+
           const paidAtFormatted =
             r.paidAt ? this.datePipe.transform(r.paidAt, 'dd/MM/yyyy HH:mm') : '—';
 
@@ -121,7 +121,7 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
             customerEmail: customer?.email ?? 'Sin correo',
             eventTitle: event?.title ?? `Evento #${r.eventId}`,
             eventDateFormatted,
-            paidAtFormatted, // 👈 agregamos esto
+            paidAtFormatted,
             tickets: ticketSummary || '—',
             totalFormatted:
               this.currencyPipe.transform(r.total, 'ARS', 'symbol', '1.0-0') ?? '—',
@@ -129,7 +129,7 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
           };
         });
 
-        // ordenar: pendientes primero, luego fecha
+
         const sorted = list.sort((a, b) => {
           if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
           if (b.status === 'PENDING' && a.status !== 'PENDING') return 1;

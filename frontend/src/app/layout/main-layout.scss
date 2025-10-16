@@ -1,0 +1,166 @@
+/* === ESTRUCTURA GENERAL === */
+.layout-container {
+  height: 100vh;
+  background-color: #f5f6f8;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, #212121 0%, #1a1a1a 100%);
+  color: #f0f0f0 !important; /* 🔧 fuerza texto claro */
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #333;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.25);
+
+  /* Aislamos el esquema de color para evitar herencia del tema Material */
+  color-scheme: dark;
+
+  .logo {
+    padding: 1.4rem 1rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #ffffff !important;
+    border-bottom: 1px solid #2f2f2f;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  mat-nav-list {
+    margin-top: 10px;
+  }
+
+  a.mat-list-item {
+    color: #e0e0e0 !important;
+    font-weight: 500;
+    border-radius: 8px;
+    margin: 4px 10px;
+    padding: 6px 8px;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+
+    mat-icon {
+      margin-right: 12px;
+      color: #e0e0e0 !important;
+      font-size: 22px;
+      opacity: 1 !important;
+      transition: color 0.25s ease;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff !important;
+
+      mat-icon {
+        color: #ffffff !important;
+      }
+    }
+
+    &.active-link {
+      background-color: #3f51b5;
+      color: #ffffff !important;
+      font-weight: 600;
+
+      mat-icon {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+/* === TOOLBAR SUPERIOR === */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 64px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  color: #333;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+  .title {
+    letter-spacing: 0.3px;
+  }
+}
+
+/* === CONTENIDO PRINCIPAL === */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f7f8fa;
+
+  .page-content {
+    flex: 1;
+    padding: 48px 80px;
+    overflow-y: auto;
+  }
+}
+
+/* === CARDS GENERALES (eventos, reservas, etc.) === */
+mat-card {
+  background-color: #ffffff;
+  border-radius: 12px !important;
+  margin-bottom: 24px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  mat-card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #2c2c2c;
+  }
+
+  mat-card-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  p {
+    color: #555;
+    font-size: 0.9rem;
+  }
+}
+
+/* === BOTONES === */
+button[mat-button],
+button[mat-raised-button],
+button[mat-stroked-button] {
+  font-weight: 500;
+  border-radius: 6px !important;
+}
+
+/* === SCROLLBAR ELEGANTE === */
+.page-content::-webkit-scrollbar {
+  width: 8px;
+}
+.page-content::-webkit-scrollbar-thumb {
+  background-color: #bfbfbf;
+  border-radius: 8px;
+}
+
+/* === FIX ICONOS OSCUROS EN TEMA MATERIAL 3 CLARO === */
+.sidebar {
+  mat-icon {
+    color: #e0e0e0 !important;
+  }
+
+  a.mat-list-item:hover mat-icon,
+  a.mat-list-item.active-link mat-icon {
+    color: #ffffff !important;
+  }
+}
