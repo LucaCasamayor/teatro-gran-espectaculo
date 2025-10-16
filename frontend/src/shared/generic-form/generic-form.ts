@@ -1,30 +1,57 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+
+export interface FieldConfig {
+  controlName: string;
+  label: string;
+  type?: string;
+  required?: boolean;
+}
 
 @Component({
   selector: 'app-generic-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatCardModule
+  ],
   templateUrl: './generic-form.html',
   styleUrls: ['./generic-form.scss']
 })
-export class GenericFormComponent {
-  @Input() config!: { label: string; controlName: string; type?: string; required?: boolean }[];
-  @Input() form!: FormGroup;
-  @Input() loading = false;
+export class GenericFormComponent implements OnInit {
+  @Input() config: FieldConfig[] = [];
+  @Input() data: any = null;
+  @Output() saved = new EventEmitter<any>();
+  @Output() cancelled = new EventEmitter<void>();
 
-  @Output() submitForm = new EventEmitter<void>();
-  @Output() cancelForm = new EventEmitter<void>();
+  form!: FormGroup;
 
-  onSubmit(): void {
-    this.submitForm.emit();
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+    const controls: Record<string, any> = {};
+    this.config.forEach(f => {
+      controls[f.controlName] = [
+        this.data?.[f.controlName] || '',
+        f.required ? Validators.required : []
+      ];
+    });
+    this.form = this.fb.group(controls);
   }
 
-  onCancel(): void {
-    this.cancelForm.emit();
+  onSubmit(): void {
+    if (this.form.valid) {
+      this.saved.emit(this.form.value);
+      this.form.reset();
+    }
   }
 }

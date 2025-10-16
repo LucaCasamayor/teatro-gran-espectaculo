@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,34 +73,75 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatus(ReservationStatus.PENDING);
         reservation.setActive(true);
 
-
         List<ReservationItem> items = new ArrayList<>();
+        boolean freeUsed = false;
+
+
         for (ReservationItemRequest itemRequest : request.getItems()) {
             TicketOption ticketOption = ticketOptionRepository.findById(itemRequest.getTicketOptionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Ticket option not found"));
-
 
             if (!ticketOption.isReservable(itemRequest.getQuantity())) {
                 throw new IllegalStateException("Not enough tickets available for " + ticketOption.getName());
             }
 
+            // Reservar las entradas (reduce capacidad disponible)
             ticketOption.reserve(itemRequest.getQuantity());
             ticketOptionRepository.save(ticketOption);
 
             ReservationItem item = new ReservationItem();
             item.setReservation(reservation);
             item.setTicketOption(ticketOption);
-            item.setQuantity(itemRequest.getQuantity());
-            item.setUnitPrice(customer.getLoyaltyFree() ? BigDecimal.ZERO : ticketOption.getPrice());
-            items.add(item);
+
+
+            if (customer.getLoyaltyFree() && !freeUsed) {
+
+                int totalQty = itemRequest.getQuantity();
+
+                // compró solo 1 entrada
+                if (totalQty == 1) {
+                    item.setQuantity(1);
+                    item.setUnitPrice(BigDecimal.ZERO);
+                    items.add(item);
+                }
+
+                // compró varias → 1 gratis + (n-1) pagas
+                else {
+                    // Ítem gratis
+                    ReservationItem freeItem = new ReservationItem();
+                    freeItem.setReservation(reservation);
+                    freeItem.setTicketOption(ticketOption);
+                    freeItem.setQuantity(1);
+                    freeItem.setUnitPrice(BigDecimal.ZERO);
+                    items.add(freeItem);
+
+                    // Ítem con precio normal (las restantes)
+                    item.setQuantity(totalQty - 1);
+                    item.setUnitPrice(ticketOption.getPrice());
+                    items.add(item);
+                }
+
+
+                freeUsed = true;
+                customer.setLoyaltyFree(false);
+            } else {
+
+                //  precio normal
+                item.setQuantity(itemRequest.getQuantity());
+                item.setUnitPrice(ticketOption.getPrice());
+                items.add(item);
+            }
         }
 
+
+        customerRepository.save(customer);
         reservation.setItems(items);
         reservation.calculateTotal();
-
         Reservation saved = reservationRepository.save(reservation);
+
         return convertToDTO(saved);
     }
+
 
 
     @Override
@@ -141,24 +183,66 @@ public class ReservationServiceImpl implements ReservationService {
             throw new IllegalStateException("You cannot modify a reservation that is already paid");
         }
 
-        if (updates.containsKey("status")) {
-            String newStatus = updates.get("status").toString();
-            ReservationStatus statusEnum = ReservationStatus.valueOf(newStatus);
+        Object statusValue = updates.get("status");
+        if (statusValue == null) {
+            throw new IllegalArgumentException("Missing 'status' field in request body");
+        }
 
-            reservation.setStatus(statusEnum);
+        String newStatus = statusValue.toString().trim().toUpperCase();
 
-            if (statusEnum == ReservationStatus.PAID) {
-                reservation.setPaidAt(LocalDateTime.now());
-            }
+        ReservationStatus statusEnum;
+        try {
+            statusEnum = ReservationStatus.valueOf(newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid status value: " + newStatus);
+        }
 
-            else if (statusEnum == ReservationStatus.CANCELLED) {
-                reservation.setPaidAt(null);
-            }
+        reservation.setStatus(statusEnum);
+
+        if (statusEnum == ReservationStatus.PAID) {
+            reservation.setPaidAt(LocalDateTime.now());
+        } else if (statusEnum == ReservationStatus.CANCELLED) {
+            reservation.setPaidAt(null);
         }
 
         reservationRepository.save(reservation);
         return convertToDTO(reservation);
     }
+
+    @Override
+    @Transactional
+    public ReservationDTO updateReservation(Long id, ReservationDTO dto) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation not found with id: " + id));
+
+        if (reservation.getStatus() == ReservationStatus.PAID) {
+            throw new IllegalStateException("You cannot modify a reservation that is already paid");
+        }
+
+
+        reservation.setAttendeeName(dto.getAttendeeName());
+        reservation.setCustomer(customerRepository.findById(dto.getCustomerId())
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found")));
+        reservation.setEvent(eventRepository.findById(dto.getEventId())
+                .orElseThrow(() -> new EntityNotFoundException("Event not found")));
+
+
+        reservation.getItems().clear();
+        for (ReservationItemDTO itemDto : dto.getItems()) {
+            TicketOption option = ticketOptionRepository.findById(itemDto.getTicketOptionId())
+                    .orElseThrow(() -> new EntityNotFoundException("Ticket option not found"));
+            ReservationItem item = new ReservationItem();
+            item.setReservation(reservation);
+            item.setTicketOption(option);
+            item.setQuantity(itemDto.getQuantity());
+            item.setUnitPrice(option.getPrice());
+            reservation.getItems().add(item);
+        }
+        reservation.calculateTotal();
+        reservationRepository.save(reservation);
+        return convertToDTO(reservation);
+    }
+
 
 
 

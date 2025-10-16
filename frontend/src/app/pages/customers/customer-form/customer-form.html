@@ -1,0 +1,25 @@
+<mat-card class="customer-form">
+  <h3>Nuevo Cliente</h3>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="firstName" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Apellido</mat-label>
+      <input matInput formControlName="lastName" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" required />
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Guardar</button>
+      <button mat-stroked-button type="button" (click)="cancel.emit()">Cancelar</button>
+    </div>
+  </form>
+</mat-card>

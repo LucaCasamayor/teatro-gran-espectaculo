@@ -1,4 +1,9 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  AfterViewInit
+} from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
@@ -17,6 +22,7 @@ import { ReservationService } from '../../../core/services/reservation.service';
 import { CustomerService } from '../../../core/services/customer.service';
 import { EventService } from '../../../core/services/event.service';
 import { Customer } from '../../../core/models/customer.model';
+import { GenericTableComponent } from '../../../../shared/generic-table/generic-table';
 
 @Component({
   selector: 'app-reservation-list',
@@ -33,16 +39,16 @@ import { Customer } from '../../../core/models/customer.model';
     MatOptionModule,
     MatIconModule,
     MatDialogModule,
-    DatePipe,
     FormsModule,
-    CurrencyPipe,
-    ReservationFormComponent
-  ]
+    ReservationFormComponent,
+    GenericTableComponent
+  ],
+  providers: [DatePipe, CurrencyPipe]
 })
 export class ReservationListComponent implements OnInit, AfterViewInit {
-  cols = ['customerName', 'customerEmail', 'eventTitle', 'eventDate', 'tickets', 'total', 'status', 'paidAt'];
-  dataSource = new MatTableDataSource<any>([]); // siempre array, nunca undefined
+  dataSource = new MatTableDataSource<any>([]);
   showForm = false;
+  editingReservation: Reservation | null = null;
 
   customers: Customer[] = [];
   events: any[] = [];
@@ -53,11 +59,12 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
     private reservationService: ReservationService,
     private customerService: CustomerService,
     private eventService: EventService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private datePipe: DatePipe,
+    private currencyPipe: CurrencyPipe
   ) {}
 
   ngOnInit(): void {
-    // Cargamos base y luego reservas (si base no está, reintenta)
     this.loadCustomers();
     this.loadEvents();
     this.loadReservations();
@@ -66,8 +73,6 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
   }
-
-  // ------------------ CARGA BASE ------------------
 
   private loadCustomers(): void {
     this.customerService.getAll().subscribe({
@@ -83,10 +88,7 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // ------------------ CARGA DE RESERVAS ------------------
-
   private loadReservations(): void {
-    // Si aún no están customers/events, reintenta breve
     if (!this.customers?.length || !this.events?.length) {
       setTimeout(() => this.loadReservations(), 200);
       return;
@@ -94,96 +96,140 @@ export class ReservationListComponent implements OnInit, AfterViewInit {
 
     this.reservationService.getAll().subscribe({
       next: (reservations) => {
-        const list = (reservations ?? []).map(r => {
-          const customer = this.customers.find(c => c.id === r.customerId);
-          const event = this.events.find(e => e.id === r.eventId);
-          const ticketSummary = (r.items ?? []).map(i => `${i.quantity} ${i.ticketOptionName}`)
+        const list = (reservations ?? []).map((r) => {
+          const customer = this.customers.find((c) => c.id === r.customerId);
+          const event = this.events.find((e) => e.id === r.eventId);
+          const ticketSummary = (r.items ?? [])
+            .map((i) => `${i.quantity} × ${i.ticketOptionName}`)
             .join(', ');
+
+          const baseDate =
+            event?.startDateTime || event?.startDate || r.createdAt;
+
+          const eventDateFormatted =
+            this.datePipe.transform(baseDate, 'dd/MM/yyyy HH:mm') ?? '—';
+
+          // 🕒 Nueva línea: formatear la fecha de pago si existe
+          const paidAtFormatted =
+            r.paidAt ? this.datePipe.transform(r.paidAt, 'dd/MM/yyyy HH:mm') : '—';
 
           return {
             ...r,
-            customerName:
-              `${customer?.firstName ?? ''} ${customer?.lastName ?? ''}`.trim() || `Cliente #${r.customerId}`,
-            customerEmail: customer?.email ?? '—',
+            customerName: customer
+              ? `${customer.firstName} ${customer.lastName}`
+              : '(Cliente eliminado)',
+            customerEmail: customer?.email ?? 'Sin correo',
             eventTitle: event?.title ?? `Evento #${r.eventId}`,
-            eventDate: event?.startDateTime ?? r.createdAt,
-            tickets: ticketSummary
+            eventDateFormatted,
+            paidAtFormatted, // 👈 agregamos esto
+            tickets: ticketSummary || '—',
+            totalFormatted:
+              this.currencyPipe.transform(r.total, 'ARS', 'symbol', '1.0-0') ?? '—',
+            statusTranslated: this.translateStatus(r.status)
           };
         });
 
-        // PENDIENTE primero, luego por fecha (más próxima primero)
+        // ordenar: pendientes primero, luego fecha
         const sorted = list.sort((a, b) => {
           if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
           if (b.status === 'PENDING' && a.status !== 'PENDING') return 1;
-          return new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime();
+          return (
+            new Date(a.eventDateFormatted).getTime() -
+            new Date(b.eventDateFormatted).getTime()
+          );
         });
 
-        // Reasignar array => fuerza update sin detectChanges()
         this.dataSource.data = [...sorted];
       },
       error: (err) => console.error('Error cargando reservas:', err)
     });
   }
 
-  // ------------------ FORM ------------------
 
+  // ---------- FORMULARIO ----------
   toggleForm(): void {
     this.showForm = !this.showForm;
+    this.editingReservation = null;
   }
 
-  onReservationCreated(): void {
+  editReservation(row: Reservation): void {
+    if (row.status === 'PAID' || row.status === 'CANCELLED') {
+      alert('No puedes editar una reserva ya pagada o cancelada.');
+      return;
+    }
+
+    this.editingReservation = row;
+    this.showForm = true;
+  }
+
+  onReservationSaved(): void {
     this.showForm = false;
-    this.loadReservations(); // refresco instantáneo
+    this.editingReservation = null;
+
+
+    setTimeout(() => this.loadReservations(), 300);
   }
 
-  // ------------------ ESTADO ------------------
+
+  reservationColumns = [
+    { key: 'customerName', label: 'Cliente' },
+    { key: 'customerEmail', label: 'Correo' },
+    { key: 'eventTitle', label: 'Evento' },
+    { key: 'eventDateFormatted', label: 'Fecha' },
+    { key: 'tickets', label: 'Entradas' },
+    { key: 'totalFormatted', label: 'Total' },
+    { key: 'status', label: 'Pago' },
+    { key: 'paidAtFormatted', label: 'Fecha de pago' }
+  ];
 
   updatePaymentStatus(row: Reservation, event: MatSelectChange): void {
-    const newStatus = event.value;
+    const newStatus = (event.value || '').toUpperCase();
     const previousStatus = row.status;
 
-    // Si ya está pagado o cancelado, no cambia mas
     if (previousStatus === 'PAID' || previousStatus === 'CANCELLED') {
-      event.source.value = previousStatus; // restaura visualmente
+      event.source.value = previousStatus;
       return;
     }
 
     const dialogRef = this.dialog.open(ConfirmDialog, {
       data: {
         title: 'Confirmar cambio de estado',
-        message: `¿Deseas marcar esta reserva como "${this.getStatusLabel(newStatus)}"?`
+        message: `¿Deseas marcar esta reserva como "${this.translateStatus(newStatus)}"?`
       }
     });
 
     dialogRef.afterClosed().subscribe((confirmed: boolean | undefined) => {
       if (!confirmed) {
-        // Si no confirma, restaurar el valor original en el select
         event.source.value = previousStatus;
         return;
       }
 
-      //actualizar en backend
-      this.reservationService.update(row.id, { status: newStatus }).subscribe({
-        next: (updated) => {
-          row.status = updated.status;
-          row.paidAt = updated.paidAt;
-          this.dataSource.data = [...this.dataSource.data]; // fuerza rerender
+      this.reservationService.updateStatus(row.id, newStatus).subscribe({
+        next: () => {
+          this.loadReservations();
         },
         error: (err) => {
           console.error('Error actualizando estado:', err);
-          event.source.value = previousStatus; // vuelve al estado anterior si falla
+          alert(err.error?.message || '❌ No se pudo actualizar el estado');
+          event.source.value = previousStatus;
         }
       });
     });
   }
 
 
-  getStatusLabel(status: string): string {
+
+
+  private translateStatus(status: string): string {
     switch (status) {
-      case 'PENDING': return 'Pendiente';
-      case 'PAID': return 'Pagado';
-      case 'CANCELLED': return 'Cancelado';
-      default: return status;
+      case 'PENDING':
+        return 'Pendiente';
+      case 'PAID':
+        return 'Pagado';
+      case 'CANCELLED':
+        return 'Cancelado';
+      default:
+        return status;
     }
   }
 }

@@ -52,4 +52,12 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.updateReservationStatus(id, updates));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ReservationDTO> updateReservation(
+            @PathVariable Long id,
+            @RequestBody ReservationDTO dto) {
+        return ResponseEntity.ok(reservationService.updateReservation(id, dto));
+    }
+
+
 }

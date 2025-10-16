@@ -12,6 +12,6 @@ public interface ReservationService {
     ReservationDTO createReservation(CreateReservationRequest request);
     List<ReservationDTO> getReservationsByCustomer(Long customerId);
     void deleteReservation(Long id);
-
+    ReservationDTO updateReservation(Long id, ReservationDTO dto);
     ReservationDTO updateReservationStatus(Long id, Map<String, Object> updates);
 }

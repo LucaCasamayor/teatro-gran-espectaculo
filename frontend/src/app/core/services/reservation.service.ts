@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {Observable, tap} from 'rxjs';
 import { Reservation } from '../models/reservation.model';
 
 @Injectable({
@@ -11,11 +11,9 @@ export class ReservationService {
 
   constructor(private http: HttpClient) {}
 
-
   getAll(): Observable<Reservation[]> {
     return this.http.get<Reservation[]>(this.apiUrl);
   }
-
 
   getById(id: number): Observable<Reservation> {
     return this.http.get<Reservation>(`${this.apiUrl}/${id}`);
@@ -26,18 +24,16 @@ export class ReservationService {
   }
 
 
-  update(id: number, data: Partial<Reservation>): Observable<Reservation> {
-    return this.http.patch<Reservation>(`${this.apiUrl}/${id}`, data);
+  updateStatus(id: number, status: string): Observable<Reservation> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const body = { status };
+    return this.http.patch<Reservation>(`${this.apiUrl}/${id}`, body, { headers });
   }
 
 
-
-  markAsPaid(id: number): Observable<Reservation> {
-    return this.http.patch<Reservation>(`${this.apiUrl}/${id}/pay`, {});
+  updateFull(id: number, data: any): Observable<Reservation> {
+    return this.http.put<Reservation>(`${this.apiUrl}/${id}`, data);
   }
 
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
 }

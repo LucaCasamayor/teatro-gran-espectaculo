@@ -1,0 +1,24 @@
+<div class="list-header">
+  <h2>Clientes</h2>
+  <button mat-flat-button color="primary" (click)="toggleForm()">
+    <mat-icon>add</mat-icon> Nuevo cliente
+  </button>
+</div>
+
+@if (showForm) {
+  <app-generic-form
+    [config]="customerFormConfig"
+    [data]="dataToEdit"
+    (saved)="createOrUpdateCustomer($event)"
+    (cancelled)="toggleForm()">
+  </app-generic-form>
+}
+
+<app-generic-table
+  [dataSource]="dataSource.data"
+  [cols]="customerColumns"
+  entityName="cliente"
+  [allowDelete]="true"
+  (edit)="editCustomer($event)"
+  (delete)="deleteCustomer($event)">
+</app-generic-table>

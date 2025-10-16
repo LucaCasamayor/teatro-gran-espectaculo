@@ -72,15 +72,12 @@ public class Reservation {
     }
 
     public BigDecimal calculateTotal() {
-        if (loyaltyFree) {
-            this.total = BigDecimal.ZERO;
-        } else {
-            this.total = items.stream()
-                    .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
+        this.total = items.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         return this.total;
     }
+
 
     public void markAsPaid() {
         this.status = ReservationStatus.PAID;
