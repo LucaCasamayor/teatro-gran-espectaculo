@@ -31,7 +31,7 @@
 
 ### Modelo de Dominio (Diagrama de Clases)
 
-📄 *Ver diagrama completo en [`Clases.puml`](./docs/uml/diagramaClases.puml) elaboración propia*
+📄 *Ver diagrama completo en [`Clases.puml`](./backend/docs/uml/diagramaClases.puml) elaboración propia*
 
 ---
 
@@ -43,7 +43,7 @@
 5. Si llega la fecha y sigue `PENDING` → el sistema la **cancela automáticamente** (`CANCELLED`).  
 6. Al marcar una reserva como `PAID`, se actualiza la fidelización del cliente.  
 
-📄 *Ver diagrama completo en [`diagramaNegocio.puml`](./docs/uml/diagramaNegocio.puml)  elaboración propia*
+📄 *Ver diagrama completo en [`diagramaNegocio.puml`](./backend/docs/uml/diagramaNegocio.puml)  elaboración propia*
 
 ---
 
@@ -58,7 +58,7 @@ username=sa
 password=
 
 ```
- 📄 *Ver diagrama entidad-relacion en [`diagrama-er.puml`](./docs/uml/diagrama-er.puml)  elaboración propia*
+ 📄 *Ver diagrama entidad-relacion en [`diagrama-er.puml`](./backend/docs/uml/diagrama-er.puml)  elaboración propia*
 
 📘 *Los archivos `schema.sql` y `data.sql` crean y cargan la base de datos inicial.*
 
