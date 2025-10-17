@@ -53,7 +53,10 @@ app-generic-table {
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   padding: 12px 0;
+
 }
+
+
 
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
@@ -79,3 +82,21 @@ app-generic-table {
     padding: 16px;
   }
 }
+
+
+:host ::ng-deep app-generic-table .mat-mdc-header-row,
+:host ::ng-deep app-generic-table .mat-mdc-row {
+  display: table-row !important; /* fuerza estructura tabular estable */
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+
+:host ::ng-deep app-generic-table .mat-mdc-header-cell,
+:host ::ng-deep app-generic-table .mat-mdc-cell {
+  display: table-cell !important;
+  border-bottom: none !important;
+  padding: 12px 16px !important;
+  vertical-align: middle !important;
+}
+
+

@@ -197,6 +197,12 @@ export class EventFormComponent {
       alert('La hora de finalización debe ser posterior a la hora de inicio.');
       return;
     }
+    const now = new Date();
+    const eventStart = new Date(start);
+    if (eventStart < now) {
+      alert('❌ No se puede crear o modificar un evento con una fecha anterior a la actual.');
+      return;
+    }
 
     const durationMs = new Date(end).getTime() - new Date(start).getTime();
     if (durationMs > 24 * 60 * 60 * 1000) {

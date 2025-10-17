@@ -30,7 +30,12 @@
   <div class="datetime-row">
     <mat-form-field appearance="outline" class="half-width">
       <mat-label>Fecha</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="startDate" />
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [min]="minDate"
+        formControlName="startDate"
+      />
       <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
       <mat-error *ngIf="hasError('startDate', 'required')">
