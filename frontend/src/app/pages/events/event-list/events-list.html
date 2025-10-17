@@ -14,21 +14,26 @@
         <mat-card-header>
           <mat-card-title>{{ event.title }}</mat-card-title>
           <mat-card-subtitle>
-            {{ event.type }} • {{ event.startDateTime | date: 'short' }}
+            {{ event.startDateTime | date: 'dd/MM/yyyy HH:mm' }} - {{
+              event.endDateTime | date: 'HH:mm'
+            }}
           </mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
           <p class="desc">{{ event.description }}</p>
-          <p class="status">Estado: <strong>{{ event.status }}</strong></p>
+          <p class="status" [ngClass]="event.status.toLowerCase()">
+            Estado: <strong>{{ translateStatus(event.status) }}</strong>
+          </p>
+
         </mat-card-content>
 
         <mat-card-actions>
-          <button mat-button color="primary" (click)="onEdit(event)">
-            Editar
-          </button>
-
           @if (event.status !== 'FINISHED') {
+            <button mat-button color="primary" (click)="onEdit(event)">
+              Editar
+            </button>
+
             <button
               mat-stroked-button
               color="accent"
@@ -36,8 +41,13 @@
             >
               Cambiar estado
             </button>
+          } @else {
+            <button mat-stroked-button color="warn" disabled>
+              Finalizado
+            </button>
           }
         </mat-card-actions>
+
       </mat-card>
     }
   </section>

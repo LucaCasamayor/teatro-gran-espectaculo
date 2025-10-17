@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormArray,
@@ -19,10 +19,26 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import {
+  MatNativeDateModule,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+  DateAdapter
+} from '@angular/material/core';
 import { EventService } from '../../../core/services/event.service';
 import { Event } from '../../../core/models/event.model';
 import { ConfirmDialog } from '../../../../shared/confirm-dialog/confirm-dialog';
-import { ChangeDetectorRef } from '@angular/core';
+
+// --- Formatos personalizados para dd/MM/yyyy ---
+export const ES_AR_FORMATS = {
+  parse: { dateInput: 'DD/MM/YYYY' },
+  display: {
+    dateInput: 'dd/MM/yyyy',
+    monthYearLabel: 'MMMM yyyy',
+    dateA11yLabel: 'dd/MM/yyyy',
+    monthYearA11yLabel: 'MMMM yyyy'
+  }
+};
 
 @Component({
   selector: 'app-event-form',
@@ -36,7 +52,12 @@ import { ChangeDetectorRef } from '@angular/core';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-AR' },
+    { provide: MAT_DATE_FORMATS, useValue: ES_AR_FORMATS }
   ],
   templateUrl: './event-form.html',
   styleUrls: ['./event-form.scss']
@@ -58,8 +79,11 @@ export class EventFormComponent {
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<EventFormComponent>,
     private cdr: ChangeDetectorRef,
+    private adapter: DateAdapter<Date>,
     @Inject(MAT_DIALOG_DATA) public data: { event?: Event }
-  ) {}
+  ) {
+    this.adapter.setLocale('es-AR');
+  }
 
   ngOnInit(): void {
     this.isEdit = !!this.data?.event;
@@ -78,7 +102,7 @@ export class EventFormComponent {
       type: ['', Validators.required],
       startDate: [null, Validators.required],
       startTime: [null, Validators.required],
-      endTime: [null, Validators.required], // hora de finalización
+      endTime: [null, Validators.required],
       description: [''],
       ticketOptions: this.fb.array([])
     });
@@ -130,7 +154,6 @@ export class EventFormComponent {
     const start = new Date(e.startDateTime);
     const end = e.endDateTime ? new Date(e.endDateTime) : new Date();
 
-
     this.form.patchValue({
       title: e.title,
       type: e.type,
@@ -154,11 +177,27 @@ export class EventFormComponent {
     });
   }
 
+  // === Corrige el corrimiento horario ===
+  private pad(n: number): string {
+    return String(n).padStart(2, '0');
+  }
+
   combineDateTime(date: Date, time: string): string {
-    const [hours, minutes] = time.split(':').map(Number);
-    const combined = new Date(date);
-    combined.setHours(hours, minutes, 0, 0);
-    return combined.toISOString();
+    const [h, m] = time.split(':').map(Number);
+    const dt = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      h, m, 0, 0
+    );
+
+    // Enviar formato sin zona horaria (para LocalDateTime)
+    const yyyy = dt.getFullYear();
+    const MM = this.pad(dt.getMonth() + 1);
+    const dd = this.pad(dt.getDate());
+    const HH = this.pad(h);
+    const mm = this.pad(m);
+    return `${yyyy}-${MM}-${dd}T${HH}:${mm}:00`;
   }
 
   formatTimeForInput(date: Date): string {
@@ -192,11 +231,12 @@ export class EventFormComponent {
     const start = this.combineDateTime(raw.startDate, raw.startTime);
     const end = this.combineDateTime(raw.startDate, raw.endTime);
 
-    // Validaciones de tiempo
+    // Validaciones
     if (new Date(end) <= new Date(start)) {
       alert('La hora de finalización debe ser posterior a la hora de inicio.');
       return;
     }
+
     const now = new Date();
     const eventStart = new Date(start);
     if (eventStart < now) {

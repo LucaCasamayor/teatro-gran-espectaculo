@@ -16,12 +16,4 @@ export class Event {
   constructor(init?: Partial<Event>) {
     Object.assign(this, init);
   }
-
-  get formattedDate(): string {
-    const start = new Date(this.startDateTime).toLocaleString();
-    const end = this.endDateTime
-      ? ' - ' + new Date(this.endDateTime).toLocaleString()
-      : '';
-    return start + end;
-  }
 }

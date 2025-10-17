@@ -31,14 +31,42 @@ export class EventsListComponent {
 
   loadEvents(): void {
     this.loading = true;
+
     this.eventService
       .getAll()
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (res) => (this.events = res),
-        error: (err) => console.error('Error cargando eventos', err)
+        next: (res) => {
+          this.events = res ?? [];
+          this.checkAndUpdateFinishedEvents();
+        },
+        error: (err) => console.error('Error cargando eventos:', err)
       });
   }
+
+  private checkAndUpdateFinishedEvents(): void {
+    const now = new Date();
+
+    this.events.forEach((event) => {
+      if (!event.endDateTime) return;
+
+      const end = new Date(event.endDateTime);
+
+      // Si ya finalizó y todavía no está marcado como FINISHED
+      if (end < now && event.status !== 'FINISHED') {
+        event.status = 'FINISHED';
+
+        // Actualizar en el backend
+        this.eventService.updateStatus(event.id!, 'FINISHED').subscribe({
+          next: () =>
+            console.log(`Evento ${event.id} actualizado a FINISHED automáticamente.`),
+          error: (err) =>
+            console.error(`Error al actualizar evento ${event.id}:`, err)
+        });
+      }
+    });
+  }
+
 
   onChangeStatus(event: Event): void {
     const nextStatus = this.getNextStatus(event.status);
@@ -114,4 +142,17 @@ export class EventsListComponent {
       if (saved) this.loadEvents();
     });
   }
+  translateStatus(status: string): string {
+    switch (status) {
+      case 'SCHEDULED':
+        return 'Programado';
+      case 'CANCELLED':
+        return 'Cancelado';
+      case 'FINISHED':
+        return 'Finalizado';
+      default:
+        return status;
+    }
+  }
+
 }
