@@ -79,8 +79,23 @@ public class EventServiceImpl implements EventService {
         event.setStartDateTime(eventDTO.getStartDateTime());
         event.setEndDateTime(eventDTO.getEndDateTime());
 
+
         if (eventDTO.getStatus() != null) {
             event.setStatus(eventDTO.getStatus());
+        }
+
+        // logica para actualizar las opciones de entradas existentes
+        if (eventDTO.getTicketOptions() != null) {
+            for (TicketOptionDTO ticketDTO : eventDTO.getTicketOptions()) {
+                event.getTicketOptions().stream()
+                        .filter(t -> t.getId().equals(ticketDTO.getId()))
+                        .findFirst()
+                        .ifPresent(ticket -> {
+                            ticket.setName(ticketDTO.getName());
+                            ticket.setPrice(ticketDTO.getPrice());
+                            ticket.setCapacity(ticketDTO.getCapacity());
+                        });
+            }
         }
 
         Event updatedEvent = eventRepository.save(event);
